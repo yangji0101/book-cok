@@ -7,6 +7,10 @@
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Noto Sans KR",sans-serif;background:#eef1ed;color:#243128}
 button,input,textarea,select{font:inherit}.shell{min-height:100vh;display:flex}.sidebar{width:235px;background:#fff;border-right:1px solid #e3e8e2;padding:28px 16px;position:fixed;inset:0 auto 0 0}.brand{font-weight:950;font-size:25px;padding:0 12px 25px}.brand small{display:block;font-size:11px;color:#7c8d81;margin-top:3px}.sidebtn{width:100%;padding:13px 14px;border:0;background:transparent;border-radius:12px;text-align:left;color:#647169;cursor:pointer;margin:3px 0;font-weight:700}.sidebtn.active,.sidebtn:hover{background:#edf5ea;color:#365b42}.content{margin-left:235px;width:calc(100% - 235px);padding:30px;max-width:1250px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}.top h1{font-size:27px;margin:0}.avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:#dce8dc}.page{display:none}.page.active{display:block}.hero{background:#edf5ea;border-radius:24px;padding:25px;display:flex;justify-content:space-between;gap:20px;align-items:center}.hero h2{margin:0 0 7px}.hero p{margin:0;color:#66736a;font-size:13px}.primary,.secondary{border:0;border-radius:13px;padding:13px 17px;font-weight:850;cursor:pointer}.primary{background:#365b42;color:white}.secondary{background:#fff;border:1px solid #d7e0d6;color:#365b42}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-top:16px}.card{background:#fff;border:1px solid #e5eae5;border-radius:18px;padding:17px}.label{font-size:12px;color:#7a857e}.num{font-size:24px;font-weight:950;margin:7px 0}.section{margin-top:25px}.section h2{font-size:18px;margin:0 0 13px}.books{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}.bookcard{background:#fff;border:1px solid #e5eae5;border-radius:18px;padding:16px;cursor:pointer}.cover{height:115px;border-radius:12px;background:#dce9d9;display:grid;place-items:center;font-size:35px;margin-bottom:12px}.bookcard b{font-size:15px}.bookcard small{display:block;color:#808b83;margin-top:6px}.bookcard .pill{display:inline-block;margin-top:10px;background:#f0f5ef;color:#54715b;border-radius:20px;padding:5px 8px;font-size:11px}.toolbar{display:flex;gap:10px;margin-bottom:15px}.toolbar input{flex:1;border:1px solid #dce3dc;border-radius:12px;padding:12px;background:white}.readingbox{max-width:700px;margin:auto}.timer{font-size:70px;font-weight:950;text-align:center;margin:50px 0 15px}.status{text-align:center;color:#68756c;font-size:13px}.actions{display:flex;gap:10px;margin-top:25px}.actions button{flex:1}.noise{margin-top:22px}.noisegrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.noise button{background:#fff;border:1px solid #dfe6df;border-radius:12px;padding:13px;cursor:pointer}.noise button.selected{border:2px solid #5f8567;background:#f2f7f1}.recordform{background:#fff;border-radius:18px;padding:20px;max-width:750px}.recordform label{display:block;font-size:12px;color:#68756c;margin:12px 0 5px}.input{width:100%;border:1px solid #dce3dc;border-radius:11px;padding:12px}.textarea{min-height:130px;resize:vertical}.recordlist{margin-top:15px}.entry{border-top:1px solid #edf0ed;padding:15px 0}.entry strong{display:block}.entry small{color:#7c877f}.detail{background:#fff;border-radius:20px;padding:24px;max-width:800px}.detailhead{display:flex;gap:18px;align-items:center}.detailcover{width:90px;height:115px;background:#dce9d9;border-radius:12px;display:grid;place-items:center;font-size:35px}.quote{background:#f5f7f3;padding:15px;border-radius:12px;margin:15px 0}.bar{height:10px;background:#e9eee9;border-radius:20px;overflow:hidden}.bar i{display:block;height:100%;background:#6b9273;border-radius:20px}.mobile-nav{display:none}
+.guestbox{display:flex;align-items:center;gap:9px;font-size:13px;color:#4a6e57}
+.guestbox b{color:#26352c}
+.guestbox button{border:1px solid #cfdccd;background:#fff;color:#3c6845;
+ border-radius:10px;padding:7px 11px;font-size:12px;font-weight:800;cursor:pointer}
 @media(max-width:800px){.sidebar{display:none}.content{margin:0;width:100%;padding:18px 15px 82px}.cards{grid-template-columns:1fr 1fr}.books{grid-template-columns:1fr 1fr}.hero{display:block}.hero button{margin-top:15px;width:100%}.mobile-nav{display:grid;position:fixed;z-index:5;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e3e8e2;grid-template-columns:repeat(5,1fr);padding:7px}.mobile-nav button{border:0;background:transparent;font-size:10px;color:#78847b}.mobile-nav button b{display:block;font-size:19px;margin-bottom:2px}.noisegrid{grid-template-columns:1fr 1fr}.top h1{font-size:23px}}
 </style>
 
@@ -58,27 +62,23 @@ body{background:linear-gradient(135deg,#f4f0e6,#eef4ec 55%,#e8eee8);color:#26352
 </aside>
 
 <main class="content">
-<div class="top"><h1 id="title">오늘도 한 페이지부터.</h1><div class="avatar">🌲</div></div>
+<div class="top"><h1 id="title">오늘도 한 페이지부터.</h1><div class="guestbox"><span>🌲 <b id="guestName">게스트</b></span><button onclick="switchGuest()">사람 바꾸기</button></div></div>
 
 <section id="home" class="page active">
 <div class="hero"><div><h2>📖 독서를 시작해볼까요?</h2><p>NFC 책갈피를 태그하면 몰입 환경과 백색소음이 준비됩니다.</p></div><div class="mascots">
 <div class="mascot sol"><div class="quill"></div><div class="body"></div><div class="face"><i class="eye e1"></i><i class="eye e2"></i><i class="nose"></i></div><div class="label">솔이 🌲</div></div>
 <div class="mascot kuk"><div class="petal"></div><div class="center"></div><div class="body"></div><div class="face"><i class="eye e1"></i><i class="eye e2"></i><i class="nose"></i></div><div class="label">국이 🌼</div></div></div><button class="primary" onclick="startReading()">NFC 태그하고 독서 시작</button></div>
 <div class="cards">
-<div class="card"><div class="label">이번 달 독서</div><div class="num">4권</div><div class="label">지난달보다 +1권</div></div>
-<div class="card"><div class="label">독서 시간</div><div class="num">8h 42m</div><div class="label">이번 달 누적</div></div>
-<div class="card"><div class="label">연속 독서</div><div class="num">12일 🔥</div><div class="label">최장 18일</div></div>
-<div class="card"><div class="label">보관된 책</div><div class="num">4권</div><div class="label">독서 기록 17개</div></div>
+<div class="card"><div class="label">이번 달 독서</div><div class="num" id="st-books">0권</div><div class="label">이번 달 읽은 책</div></div>
+<div class="card"><div class="label">독서 시간</div><div class="num" id="st-time">0m</div><div class="label">이번 달 누적</div></div>
+<div class="card"><div class="label">연속 독서</div><div class="num" id="st-streak">0일</div><div class="label">오늘까지 이어서</div></div>
+<div class="card"><div class="label">보관된 책</div><div class="num" id="st-shelf">0권</div><div class="label" id="st-shelf-sub">독서 기록 0개</div></div>
 </div>
 <div class="section"><h2>📅 월별 독서 기록</h2><div class="monthgrid">
 <div class="card"><div style="display:flex;justify-content:space-between"><b>최근 6개월 독서 시간</b><span class="label" id="monthTotal">계산 중</span></div><div class="monthbars" id="monthBars"></div></div>
 <div class="card"><b>이번 달 읽은 책</b><div id="monthBooks" style="margin-top:12px"></div></div>
 </div></div>
-<div class="section"><h2>📚 최근 보관함</h2><div class="books">
-<div class="bookcard" onclick="openBook('데미안')"><div class="cover">📘</div><b>데미안</b><small>독서 기록 5개 · 132p</small><span class="pill">완독</span></div>
-<div class="bookcard" onclick="openBook('아몬드')"><div class="cover">📗</div><b>아몬드</b><small>독서 기록 4개 · 98p</small><span class="pill">읽는 중</span></div>
-<div class="bookcard" onclick="openBook('모모')"><div class="cover">📙</div><b>모모</b><small>독서 기록 3개 · 76p</small><span class="pill">완독</span></div>
-</div></div>
+<div class="section"><h2>📚 최근 보관함</h2><div class="books" id="homeBooks"></div></div>
 </section>
 
 <section id="reading" class="page">
@@ -94,7 +94,7 @@ body{background:linear-gradient(135deg,#f4f0e6,#eef4ec 55%,#e8eee8);color:#26352
 
 <section id="record" class="page">
 <div class="recordform"><h2>📝 독서 기록</h2>
-<label>책 제목</label><input id="bookTitle" class="input" value="데미안">
+<label>책 제목</label><input id="bookTitle" class="input" placeholder="예: 데미안">
 <label>읽은 범위</label><input id="bookRange" class="input" placeholder="예: 32p ~ 57p">
 <label>오늘의 한 문장</label><input id="bookQuote" class="input" placeholder="기억에 남은 문장이나 생각">
 <label>내 생각</label><textarea id="bookThought" class="input textarea" placeholder="왜 인상 깊었는지 자유롭게 적어보세요."></textarea>
@@ -104,28 +104,18 @@ body{background:linear-gradient(135deg,#f4f0e6,#eef4ec 55%,#e8eee8);color:#26352
 <section id="library" class="page">
 <h2>📚 나의 독서 보관함</h2><div class="storage-note">💾 독서 시간·책·기록·완독 상태가 이 브라우저에 저장됩니다.</div><p class="label">책마다 독서 기록이 따로 쌓입니다. 책을 누르면 해당 책의 포트폴리오를 확인할 수 있어요.</p>
 <div class="toolbar"><input placeholder="책 제목 검색..." oninput="filterBooks(this.value)"><button class="secondary" onclick="alert('새 책 등록 기능은 다음 버전에서 연결할 수 있어요.')">＋ 책 추가</button></div>
-<div class="storage-note">💾 이 버전은 브라우저의 <b>IndexedDB</b>에 독서 기록을 실제 저장합니다. 같은 기기·브라우저에서 다시 열어도 기록이 유지됩니다.</div><div id="libraryBooks" class="books">
-<div class="bookcard" data-name="데미안" onclick="openBook('데미안')"><div class="cover">📘</div><b>데미안</b><small>기록 5개 · 132p · 2시간 18분</small><span class="pill">완독</span></div>
-<div class="bookcard" data-name="아몬드" onclick="openBook('아몬드')"><div class="cover">📗</div><b>아몬드</b><small>기록 4개 · 98p · 1시간 42분</small><span class="pill">읽는 중</span></div>
-<div class="bookcard" data-name="모모" onclick="openBook('모모')"><div class="cover">📙</div><b>모모</b><small>기록 3개 · 76p · 1시간 21분</small><span class="pill">완독</span></div>
-<div class="bookcard" data-name="어린 왕자" onclick="openBook('어린 왕자')"><div class="cover">📕</div><b>어린 왕자</b><small>기록 5개 · 95p · 1시간 55분</small><span class="pill">완독</span></div>
-</div>
+<div class="storage-note">💾 기록은 <b>이 브라우저</b>에 사람별로 따로 저장됩니다. 오른쪽 위 <b>사람 바꾸기</b>를 누르면 다른 사람의 칸으로 넘어갑니다.</div><div id="libraryBooks" class="books"></div>
 </section>
 
 <section id="bookdetail" class="page">
 <button class="secondary" onclick="show('library',null)">← 보관함으로</button>
-<div class="detail section"><div class="detailhead"><div class="detailcover">📘</div><div><h2 id="detailTitle">데미안</h2><div class="label">나의 독서 포트폴리오</div><div style="margin-top:8px">📖 132p · ⏱️ 2h 18m · 📝 5개 기록</div></div></div>
-<div class="section"><h3>📈 이 책의 독서 기록</h3><div class="bar"><i style="width:78%"></i></div><p class="label">읽기 진행률 78%</p></div>
-<div class="section"><h3>📝 기록 모음</h3>
-<div class="entry"><strong>6월 14일 · 32~57p</strong><small>“오늘 읽은 내용에서 인상 깊었던 점”</small><div class="quote">주인공이 자신의 생각을 스스로 선택해가는 과정이 기억에 남았다.</div></div>
-<div class="entry"><strong>6월 16일 · 58~81p</strong><small>나의 생각</small><div class="quote">다른 사람의 기준보다 자신의 질문을 갖는 것이 중요하다고 느꼈다.</div></div>
-<div class="entry"><strong>6월 19일 · 82~105p</strong><small>오늘의 질문</small><div class="quote">나는 어떤 선택을 할 때 다른 사람의 시선을 가장 많이 의식하는가?</div></div>
-</div></div>
+<div class="detail section"><div class="detailhead"><div class="detailcover">📘</div><div><h2 id="detailTitle">데미안</h2><div class="label">나의 독서 포트폴리오</div><div style="margin-top:8px" id="detailMeta"></div></div></div>
+</div>
 </section>
 
 <section id="growth" class="page">
-<h2>📊 나의 독서 성장</h2><div class="cards"><div class="card"><div class="label">읽은 책</div><div class="num">17권</div></div><div class="card"><div class="label">총 독서 시간</div><div class="num">32h</div></div><div class="card"><div class="label">작성 기록</div><div class="num">17개</div></div><div class="card"><div class="label">연속 독서</div><div class="num">12일</div></div></div>
-<div class="section card"><h2>이번 달 목표 · 10권</h2><div class="bar"><i style="width:40%"></i></div><p class="label">4 / 10권</p></div>
+<h2>📊 나의 독서 성장</h2><div class="cards"><div class="card"><div class="label">읽은 책</div><div class="num" id="g-books">0권</div></div><div class="card"><div class="label">총 독서 시간</div><div class="num" id="g-time">0m</div></div><div class="card"><div class="label">작성 기록</div><div class="num" id="g-entries">0개</div></div><div class="card"><div class="label">연속 독서</div><div class="num" id="g-streak">0일</div></div></div>
+<div class="section card"><h2>이번 달 목표 · 10권</h2><div class="bar"><i id="goalBar" style="width:0%"></i></div><p class="label" id="goalText">0 / 10권</p></div>
 </section>
 </main>
 </div>
@@ -135,6 +125,29 @@ body{background:linear-gradient(135deg,#f4f0e6,#eef4ec 55%,#e8eee8);color:#26352
 </nav>
 
 <script>
+/* ── 게스트 ────────────────────────────────────────────────────
+   한 기기를 여러 사람이 써도 기록이 섞이지 않게 한다.
+   처음 들어오면 손님 번호를 하나 만들어 이 브라우저에 적어 둔다.
+   주소 뒤에 ?u=이름 을 붙이면 그 이름으로 따로 쌓인다.          */
+function newGuestId(){return Math.random().toString(36).slice(2,8)}
+function guestId(){
+ const q=new URLSearchParams(location.search).get('u');
+ if(q){try{localStorage.setItem('bookcok_guest',q)}catch(e){}return q}
+ let id=null;try{id=localStorage.getItem('bookcok_guest')}catch(e){}
+ if(!id){id=newGuestId();try{localStorage.setItem('bookcok_guest',id)}catch(e){}}
+ return id;
+}
+const GUEST=guestId();
+/* 저장 이름표. 사람이 바뀌면 통째로 다른 칸을 쓴다. */
+const K=n=>'bookcok_'+n+'__'+GUEST;
+function switchGuest(){
+ const name=prompt('이름이나 별명을 넣으면 그 이름으로 기록이 따로 쌓입니다.\n비워 두고 확인을 누르면 새 손님으로 시작합니다.','');
+ if(name===null)return;
+ const id=name.trim()||newGuestId();
+ try{localStorage.setItem('bookcok_guest',id)}catch(e){}
+ location.href=location.pathname+'?u='+encodeURIComponent(id);
+}
+
 let timerSec=0,running=false,timerId=null,currentNoise=null;
 function show(id,btn){
  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
@@ -192,7 +205,7 @@ async function getRecords(){
 async function renderLibrary(){
  const box=document.getElementById('libraryBooks'),records=await getRecordsSafe();renderMonthly(records);
  const grouped={};records.forEach(r=>(grouped[r.bookTitle]??=[]).push(r));
- const completed=JSON.parse(localStorage.getItem('bookcok_completed')||'{}');
+ const completed=JSON.parse(localStorage.getItem(K('completed'))||'{}');
  const demo=[['데미안','📘','5개 기록 · 132p','완독'],['아몬드','📗','4개 기록 · 98p','읽는 중'],['모모','📙','3개 기록 · 76p','완독'],['어린 왕자','📕','5개 기록 · 95p','완독']];
  let cards='';
  Object.entries(grouped).forEach(([name,rs])=>{
@@ -203,8 +216,8 @@ async function renderLibrary(){
  box.innerHTML=cards||'<div class="empty">아직 저장된 독서 기록이 없습니다.<br>첫 독서를 시작해보세요 📖</div>';
 }
 function toggleComplete(name){
- const c=JSON.parse(localStorage.getItem('bookcok_completed')||'{}');c[name]=!c[name];if(!c[name])delete c[name];
- localStorage.setItem('bookcok_completed',JSON.stringify(c));renderLibrary();
+ const c=JSON.parse(localStorage.getItem(K('completed'))||'{}');c[name]=!c[name];if(!c[name])delete c[name];
+ localStorage.setItem(K('completed'),JSON.stringify(c));renderLibrary();
 }
 function renderMonthly(records){
  const now=new Date(),months=[];
@@ -213,6 +226,47 @@ function renderMonthly(records){
  const max=Math.max(60,...months.map(x=>x.minutes));document.getElementById('monthBars').innerHTML=months.map(x=>`<div class="monthbar"><em>${x.minutes?x.minutes+'분':'-'}</em><i style="height:${Math.max(3,x.minutes/max*105)}px"></i><span>${x.label}</span></div>`).join('');
  const total=months.reduce((a,x)=>a+x.minutes,0);document.getElementById('monthTotal').textContent=`6개월 ${Math.floor(total/60)}시간 ${total%60}분`;
  const cur=months[5],list=[...cur.books];document.getElementById('monthBooks').innerHTML=list.length?list.map(x=>`<div style="padding:8px 0;border-bottom:1px solid #edf0ed">📖 <b>${esc(x)}</b></div>`).join(''):'<div class="label">이번 달 기록된 책이 아직 없어요.</div>';
+}
+function hhmm(min){return min>=60?Math.floor(min/60)+'h '+(min%60)+'m':min+'m'}
+/* 오늘(또는 어제)부터 거슬러 올라가며 기록이 끊기지 않은 날 수 */
+function streakDays(records){
+ const 날=new Set(records.map(r=>new Date(r.createdAt).toDateString()));
+ let n=0,d=new Date();
+ if(!날.has(d.toDateString())) d.setDate(d.getDate()-1);
+ while(날.has(d.toDateString())){n++;d.setDate(d.getDate()-1)}
+ return n;
+}
+/* 박아 둔 숫자는 쓰지 않는다. 화면에 보이는 값은 전부 여기서 나온다. */
+function renderStats(records){
+ const 분=rs=>Math.round(rs.reduce((a,r)=>a+(r.duration||0),0)/60);
+ const n=new Date();
+ const 이번달=records.filter(r=>{const d=new Date(r.createdAt);
+  return d.getFullYear()===n.getFullYear()&&d.getMonth()===n.getMonth()});
+ const 책=[...new Set(records.map(r=>r.bookTitle))];
+ const 달책=[...new Set(이번달.map(r=>r.bookTitle))];
+ const 연속=streakDays(records);
+ const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v};
+ set('st-books',달책.length+'권'); set('st-time',hhmm(분(이번달)));
+ set('st-streak',연속+'일'+(연속?' 🔥':''));
+ set('st-shelf',책.length+'권'); set('st-shelf-sub','독서 기록 '+records.length+'개');
+ set('g-books',책.length+'권'); set('g-time',hhmm(분(records)));
+ set('g-entries',records.length+'개'); set('g-streak',연속+'일');
+ set('goalText',달책.length+' / 10권');
+ const bar=document.getElementById('goalBar');
+ if(bar)bar.style.width=Math.min(100,달책.length*10)+'%';
+ set('guestName',GUEST);
+ /* 홈의 최근 보관함 — 마지막에 읽은 세 권 */
+ const box=document.getElementById('homeBooks');
+ if(!box)return;
+ const 최근=[];
+ [...records].sort((a,b)=>b.createdAt.localeCompare(a.createdAt))
+  .forEach(r=>{if(!최근.includes(r.bookTitle)&&최근.length<3)최근.push(r.bookTitle)});
+ box.innerHTML=최근.length?최근.map(name=>{
+  const rs=records.filter(r=>r.bookTitle===name);
+  return '<div class="bookcard" onclick="openBook(\''+jsq(name)+'\')">'
+   +'<div class="cover">📖</div><b>'+esc(name)+'</b>'
+   +'<small>독서 기록 '+rs.length+'개 · 누적 '+분(rs)+'분</small></div>';
+ }).join(''):'<div class="empty">아직 기록이 없습니다. 첫 독서를 시작해보세요 📖</div>';
 }
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function jsq(s){return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'")}
@@ -244,6 +298,11 @@ async function openBook(name){
 function filterBooks(q){q=q.toLowerCase();document.querySelectorAll('#libraryBooks .bookcard').forEach(c=>c.style.display=c.dataset.name.toLowerCase().includes(q)?'block':'none')}
 
 async function initStorage(){
+ /* IndexedDB 쪽 코드는 openDB() 가 없어서 한 번도 동작한 적이 없다.
+    이제는 시도하지 않고 곧바로 localStorage 를 쓴다. */
+ window.bookcokStorage='localStorage';
+ try{await renderLibraryFallback()}catch(e){console.error(e)}
+ return;
  try{
    if(!window.indexedDB) throw new Error('IndexedDB unavailable');
    await openDB();
@@ -257,7 +316,7 @@ async function initStorage(){
 }
 async function getRecordsSafe(){
  if(window.bookcokStorage==='indexeddb') return await getRecords();
- return JSON.parse(localStorage.getItem('bookcok_records')||'[]');
+ return JSON.parse(localStorage.getItem(K('records'))||'[]');
 }
 async function addRecordSafe(record){
  if(window.bookcokStorage==='indexeddb'){
@@ -268,20 +327,21 @@ async function addRecordSafe(record){
      tx.onerror=()=>reject(tx.error);
    });
  }
- const arr=JSON.parse(localStorage.getItem('bookcok_records')||'[]');
+ const arr=JSON.parse(localStorage.getItem(K('records'))||'[]');
  arr.push({...record,id:Date.now()+Math.random()});
- localStorage.setItem('bookcok_records',JSON.stringify(arr));
+ localStorage.setItem(K('records'),JSON.stringify(arr));
 }
 async function renderLibraryFallback(){
  const records=await getRecordsSafe(),box=document.getElementById('libraryBooks');
  if(typeof renderMonthly==='function') renderMonthly(records);
+ renderStats(records);
  const grouped={};records.forEach(r=>(grouped[r.bookTitle]??=[]).push(r));
- const completed=JSON.parse(localStorage.getItem('bookcok_completed')||'{}');
- const demo=[['데미안','📘'],['아몬드','📗'],['모모','📙'],['어린 왕자','📕']];
- const names=[...new Set([...Object.keys(grouped),...demo.map(x=>x[0])])];
+ const completed=JSON.parse(localStorage.getItem(K('completed'))||'{}');
+ const names=Object.keys(grouped);
+ if(!names.length){box.innerHTML='<div class="empty">아직 저장된 독서 기록이 없습니다.<br>첫 독서를 시작해보세요 📖</div>';return}
  box.innerHTML=names.map(name=>{
-  const rs=grouped[name]||[],done=!!completed[name],icon=(demo.find(x=>x[0]===name)||[])[1]||'📚';
-  return `<div class="bookcard" data-name="${esc(name)}" onclick="openBook('${jsq(name)}')"><div class="cover">${icon}</div><b>${esc(name)}</b><small>${rs.length?rs.length+'개 기록 · 누적 '+Math.round(rs.reduce((a,r)=>a+(r.duration||0),0)/60)+'분':'샘플 책'}</small><div class="book-actions"><span class="pill">${done?'완독 ✓':'읽는 중'}</span><button class="complete ${done?'done':''}" onclick="event.stopPropagation();toggleComplete('${jsq(name)}')">${done?'완독 취소':'✓ 완독'}</button></div></div>`;
+  const rs=grouped[name]||[],done=!!completed[name],icon='📚';
+  return `<div class="bookcard" data-name="${esc(name)}" onclick="openBook('${jsq(name)}')"><div class="cover">${icon}</div><b>${esc(name)}</b><small>${rs.length}개 기록 · 누적 ${Math.round(rs.reduce((a,r)=>a+(r.duration||0),0)/60)}분</small><div class="book-actions"><span class="pill">${done?'완독 ✓':'읽는 중'}</span><button class="complete ${done?'done':''}" onclick="event.stopPropagation();toggleComplete('${jsq(name)}')">${done?'완독 취소':'✓ 완독'}</button></div></div>`;
  }).join('');
 }
 initStorage();
