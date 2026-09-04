@@ -17,6 +17,11 @@ button,input,textarea,select{font:inherit}.shell{min-height:100vh;display:flex}.
  padding:10px 11px;font-size:12px;word-break:break-all;font-family:ui-monospace,Consolas,monospace}
 .urlrow button{flex:none;padding:10px 13px;font-size:12px}
 #nfcsetup ol{margin:8px 0 0;padding-left:20px}#nfcsetup li{margin:5px 0;font-size:14px}
+table.prep{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px}
+table.prep td{border-top:1px solid #e6ede5;padding:9px 4px;vertical-align:top;line-height:1.6}
+table.prep td:first-child{width:34%;white-space:nowrap;color:#3c6845}
+@media(max-width:520px){table.prep td{display:block;border:0;padding:2px 0}
+ table.prep td:first-child{padding-top:11px;border-top:1px solid #e6ede5;width:auto}}
 .dndlink{display:inline-block;margin:12px 0 0;background:#365b42;color:#fff;text-decoration:none; border-radius:11px;padding:11px 15px;font-weight:800;font-size:14px}
 .warnbox{background:#fdf2f0;border:1px solid #eecdc8;border-radius:14px;padding:15px 17px;
  margin-top:12px;font-size:14px;line-height:1.7}
@@ -163,6 +168,23 @@ body{background:linear-gradient(135deg,#f4f0e6,#eef4ec 55%,#e8eee8);color:#26352
 <h2 style="margin-top:34px">🤖 안드로이드</h2>
 <p class="label">안드로이드는 단축어가 없습니다. <b>태그가 주소를 들고 있어야</b> 하고, 방해금지는 매크로 앱이 켭니다.</p>
 <div class="card" style="margin-top:14px">
+ <b>0. 먼저 준비할 것</b>
+ <table class="prep"><tbody>
+  <tr><td><b>내 폰이 NFC 되는가</b></td>
+   <td>설정에서 <span class="kbd">NFC</span> 를 검색합니다. 안 나오면 이 폰은 태그를 못 읽습니다 —
+    앱은 그대로 쓰고 <b>홈 화면 아이콘</b>으로 엽니다.</td></tr>
+  <tr><td><b>NFC 켜기</b></td><td>설정 → 연결 → <b>NFC</b> 켬. 꺼져 있으면 태그를 대도 아무 일도 없습니다.</td></tr>
+  <tr><td><b>NFC Tools</b></td><td>플레이스토어 · 무료. <b>태그에 주소를 써 넣는</b> 데만 씁니다.
+   한 번 쓰고 나면 지워도 됩니다.</td></tr>
+  <tr><td><b>MacroDroid</b></td><td>플레이스토어 · 무료(매크로 5개까지). <b>방해금지를 켜는</b> 일을 합니다.
+   <span class="kbd">Automate</span> 로 대신해도 됩니다.</td></tr>
+  <tr><td><b>방해금지 접근 권한</b></td><td>MacroDroid 안에서 처음 한 번 허용합니다.
+   이걸 안 주면 매크로가 도는데 방해금지만 안 켜집니다.</td></tr>
+  <tr><td><b>크롬</b></td><td>이미 깔려 있습니다. 태그가 여는 것이 크롬입니다.</td></tr>
+ </tbody></table>
+ <p class="label" style="margin-top:10px">태그만 쓰고 방해금지는 손으로 켜겠다면 <b>NFC Tools 하나면 됩니다.</b></p>
+</div>
+<div class="card" style="margin-top:12px">
  <b>1. 태그에 주소 써 넣기 — <span class="kbd">NFC Tools</span> 앱</b>
  <ol><li>쓰기 → 레코드 추가 → <b>URL/URI</b></li>
  <li>아래 주소를 넣고 <b>쓰기</b> → 태그에 대기</li>
