@@ -185,16 +185,40 @@ body{background:linear-gradient(135deg,#f4f0e6,#eef4ec 55%,#e8eee8);color:#26352
  <p class="label" style="margin-top:10px">태그만 쓰고 방해금지는 손으로 켜겠다면 <b>NFC Tools 하나면 됩니다.</b></p>
 </div>
 <div class="card" style="margin-top:12px">
- <b>1. 태그에 주소 써 넣기 — <span class="kbd">NFC Tools</span> 앱</b>
- <ol><li>쓰기 → 레코드 추가 → <b>URL/URI</b></li>
- <li>아래 주소를 넣고 <b>쓰기</b> → 태그에 대기</li>
- <li><b>잠금(Lock)은 절대 누르지 않습니다</b> — 한 번 잠그면 영영 못 고칩니다</li></ol>
- <div class="urlrow"><code id="urlTag"></code>
-  <button class="secondary" onclick="copyURL('urlTag',this)">복사</button></div>
- <p class="label" style="margin-top:10px">여기까지만 해도 <b>태그 → 앱 열림</b> 은 됩니다. 방해금지만 손으로 켭니다.</p>
+ <b>1. 먼저 <u>읽어</u> 봅니다 — 어디에 대야 하는지 익히는 과정입니다</b>
+ <ol><li><span class="kbd">NFC Tools</span> 앱 (만든 곳 <b>wakdev</b>, 비슷한 이름이 많습니다)</li>
+ <li>아래 탭 <b>읽기</b> → 가운데 <b>스캔</b></li>
+ <li>태그를 폰 <b>뒷면 중앙~위쪽</b>에 댑니다. 기종마다 달라서 <b>위아래로 천천히 훑습니다</b></li>
+ <li>삑 하고 <b>NTAG213</b> 같은 종류와 용량이 뜨면 살아 있는 태그입니다</li></ol>
+ <p class="label" style="margin-top:8px">반응이 없으면 — 댄 자리를 바꿔서 다시 / <b>두꺼운 케이스는 빼고</b> /
+  설정에서 NFC가 켜져 있는지 / 금속 위에 붙은 태그는 잘 안 읽힙니다.</p>
 </div>
 <div class="card" style="margin-top:12px">
- <b>2. 방해금지까지 자동으로 — <span class="kbd">MacroDroid</span></b>
+ <b>2. 주소 써 넣기</b>
+ <ol><li>탭 <b>쓰기</b> → <b>레코드 추가</b></li>
+ <li>긴 목록에서 <b>URL/URI</b> 를 찾아 누릅니다 (Text·이메일·전화 사이에 있습니다)</li>
+ <li>아래 주소를 붙여넣고 확인 → 목록에 한 줄이 생깁니다</li>
+ <li>아래 <b>쓰기</b> 버튼 → 태그를 아까 그 자리에 댑니다</li>
+ <li><b>쓰기 완료</b> 가 뜨면 끝입니다</li></ol>
+ <div class="urlrow"><code id="urlTag"></code>
+  <button class="secondary" onclick="copyURL('urlTag',this)">복사</button></div>
+ <p class="label" style="margin-top:10px"><b>확인</b> — <b>읽기</b> 탭에서 다시 스캔해서 방금 쓴 주소가 보이면 됐습니다.</p>
+</div>
+<div class="warnbox">
+ ⛔ <b>기타(Other) 탭의 「태그 잠금(Lock tag)」은 절대 누르지 않습니다.</b>
+ 한 번 누르면 그 태그는 <b>영원히</b> 못 고칩니다. 되돌릴 방법이 없습니다.
+</div>
+<div class="card" style="margin-top:12px">
+ <b>3. 실제로 태그해 보기</b>
+ <ol><li><b>NFC Tools 앱을 닫습니다.</b> 켜 두면 앱이 태그를 가로챕니다</li>
+ <li><b>잠금을 풀고 홈 화면</b>에서 태그를 댑니다. 잠금화면에서는 안 됩니다</li>
+ <li>안드로이드는 <b>크롬이 바로 열립니다</b> (아이폰은 화면 위 배너를 손으로 눌러야 열립니다)</li>
+ <li>이 앱이 뜨고 <b>독서 화면</b>으로 바로 들어가면 성공입니다</li></ol>
+ <p class="label" style="margin-top:8px">아무 배너도 없이 그냥 앱만 열리면 주소에서 <span class="kbd">?src=nfc</span> 가 빠진 것입니다.
+  연달아 두 번 대면 안 읽힐 수 있습니다 — 화면을 껐다 켜고 다시 댑니다.</p>
+</div>
+<div class="card" style="margin-top:12px">
+ <b>4. 방해금지까지 자동으로 — <span class="kbd">MacroDroid</span></b>
  <ol><li>트리거: <b>NFC 태그</b></li>
  <li>동작: <b>방해금지 ON</b> + <b>웹페이지 열기</b>(위 주소)</li>
  <li>처음 한 번 <b>방해금지 접근 권한</b>을 허용해야 합니다</li></ol>
