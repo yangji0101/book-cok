@@ -13,6 +13,25 @@
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Noto Sans KR",sans-serif;background:#eef1ed;color:#243128}
 button,input,textarea,select{font:inherit}.shell{min-height:100vh;display:flex}.sidebar{width:235px;background:#fff;border-right:1px solid #e3e8e2;padding:28px 16px;position:fixed;inset:0 auto 0 0}.brand{font-weight:950;font-size:25px;padding:0 12px 25px}.brand small{display:block;font-size:11px;color:#7c8d81;margin-top:3px}.sidebtn{width:100%;padding:13px 14px;border:0;background:transparent;border-radius:12px;text-align:left;color:#647169;cursor:pointer;margin:3px 0;font-weight:700}.sidebtn.active,.sidebtn:hover{background:#edf5ea;color:#365b42}.content{margin-left:235px;width:calc(100% - 235px);padding:30px;max-width:1250px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}.top h1{font-size:27px;margin:0}.avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:#dce8dc}.page{display:none}.page.active{display:block}.hero{background:#edf5ea;border-radius:24px;padding:25px;display:flex;justify-content:space-between;gap:20px;align-items:center}.hero h2{margin:0 0 7px}.hero p{margin:0;color:#66736a;font-size:13px}.primary,.secondary{border:0;border-radius:13px;padding:13px 17px;font-weight:850;cursor:pointer}.primary{background:#365b42;color:white}.secondary{background:#fff;border:1px solid #d7e0d6;color:#365b42}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-top:16px}.card{background:#fff;border:1px solid #e5eae5;border-radius:18px;padding:17px}.label{font-size:12px;color:#7a857e}.num{font-size:24px;font-weight:950;margin:7px 0}.section{margin-top:25px}.section h2{font-size:18px;margin:0 0 13px}.books{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}.bookcard{background:#fff;border:1px solid #e5eae5;border-radius:18px;padding:16px;cursor:pointer}.cover{height:115px;border-radius:12px;background:#dce9d9;display:grid;place-items:center;font-size:35px;margin-bottom:12px}.bookcard b{font-size:15px}.bookcard small{display:block;color:#808b83;margin-top:6px}.bookcard .pill{display:inline-block;margin-top:10px;background:#f0f5ef;color:#54715b;border-radius:20px;padding:5px 8px;font-size:11px}.toolbar{display:flex;gap:10px;margin-bottom:15px}.toolbar input{flex:1;border:1px solid #dce3dc;border-radius:12px;padding:12px;background:white}.readingbox{max-width:700px;margin:auto}.timer{font-size:70px;font-weight:950;text-align:center;margin:50px 0 15px}.status{text-align:center;color:#68756c;font-size:13px}.actions{display:flex;gap:10px;margin-top:25px}.actions button{flex:1}.noise{margin-top:22px}.noisegrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.noise button{background:#fff;border:1px solid #dfe6df;border-radius:12px;padding:13px;cursor:pointer}.noise button.selected{border:2px solid #5f8567;background:#f2f7f1}.recordform{background:#fff;border-radius:18px;padding:20px;max-width:750px}.recordform label{display:block;font-size:12px;color:#68756c;margin:12px 0 5px}.input{width:100%;border:1px solid #dce3dc;border-radius:11px;padding:12px}.textarea{min-height:130px;resize:vertical}.recordlist{margin-top:15px}.entry{border-top:1px solid #edf0ed;padding:15px 0}.entry strong{display:block}.entry small{color:#7c877f}.detail{background:#fff;border-radius:20px;padding:24px;max-width:800px}.detailhead{display:flex;gap:18px;align-items:center}.detailcover{width:90px;height:115px;background:#dce9d9;border-radius:12px;display:grid;place-items:center;font-size:35px}.quote{background:#f5f7f3;padding:15px;border-radius:12px;margin:15px 0}.bar{height:10px;background:#e9eee9;border-radius:20px;overflow:hidden}.bar i{display:block;height:100%;background:#6b9273;border-radius:20px}.mobile-nav{display:none}
+.growbox{display:flex;gap:16px;align-items:center;background:#fff;border:1px solid #e0e8df;
+ border-radius:20px;padding:18px 20px;margin:16px 0 0;box-shadow:0 8px 24px rgba(47,66,52,.055)}
+.growface{font-size:46px;line-height:1;flex:none}
+.growbox.big .growface{font-size:66px}
+.growtext{flex:1;min-width:0}
+.growtext b{font-size:18px}
+.growtext p{margin:3px 0 10px;font-size:13px;color:#6b7a70}
+.growtext small{display:block;margin-top:7px;font-size:12px;color:#7c887f}
+.steps{display:flex;gap:9px;overflow-x:auto;padding:2px 2px 6px}
+.steps .step{flex:none;width:92px;text-align:center;background:#fff;border:1px solid #e5eae5;
+ border-radius:15px;padding:12px 6px;opacity:.45}
+.steps .step.done{opacity:.8}
+.steps .step.now{opacity:1;border:2px solid #6b9273;background:#f2f7f1}
+.steps .step span{display:block;font-size:27px}
+.steps .step b{display:block;font-size:13px;margin-top:5px}
+.steps .step small{display:block;font-size:11px;color:#7c887f;margin-top:3px}
+.testbox{background:#fbf7ec;border:1px dashed #ddd0ae;border-radius:14px;padding:14px 16px;
+ margin:16px 0 0;font-size:14px;line-height:1.7}
+.testbox button{margin:0 8px}
 .dnd{border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.6;margin:18px 0 0}
 .dnd.on{background:#e9f2e8;border:1px solid #cadfc7;color:#3c6845}
 .dnd.off{background:#fff6e9;border:1px solid #eddcc4;color:#8a6420}
@@ -93,6 +112,7 @@ body{background:linear-gradient(135deg,#f4f0e6,#eef4ec 55%,#e8eee8);color:#26352
 <div class="hero"><div><h2>📖 독서를 시작해볼까요?</h2><p>NFC 책갈피를 태그하면 몰입 환경과 백색소음이 준비됩니다.</p></div><div class="mascots">
 <div class="mascot sol"><div class="quill"></div><div class="body"></div><div class="face"><i class="eye e1"></i><i class="eye e2"></i><i class="nose"></i></div><div class="label">솔이 🌲</div></div>
 <div class="mascot kuk"><div class="petal"></div><div class="center"></div><div class="body"></div><div class="face"><i class="eye e1"></i><i class="eye e2"></i><i class="nose"></i></div><div class="label">국이 🌼</div></div></div><button class="primary" onclick="startReading()">NFC 태그하고 독서 시작</button></div>
+<div id="growHome" class="growbox"></div>
 <div class="cards">
 <div class="card"><div class="label">이번 달 독서</div><div class="num" id="st-books">0권</div><div class="label">이번 달 읽은 책</div></div>
 <div class="card"><div class="label">독서 시간</div><div class="num" id="st-time">0m</div><div class="label">이번 달 누적</div></div>
@@ -130,7 +150,7 @@ body{background:linear-gradient(135deg,#f4f0e6,#eef4ec 55%,#e8eee8);color:#26352
 
 <section id="library" class="page">
 <h2>📚 나의 독서 보관함</h2><div class="storage-note">💾 독서 시간·책·기록·완독 상태가 이 브라우저에 저장됩니다.</div><p class="label">책마다 독서 기록이 따로 쌓입니다. 책을 누르면 해당 책의 포트폴리오를 확인할 수 있어요.</p>
-<div class="toolbar"><input placeholder="책 제목 검색..." oninput="filterBooks(this.value)"><button class="secondary" onclick="alert('새 책 등록 기능은 다음 버전에서 연결할 수 있어요.')">＋ 책 추가</button></div>
+<div class="toolbar"><input placeholder="책 제목 검색..." oninput="filterBooks(this.value)"><button class="secondary" onclick="addBook()">＋ 책 추가</button></div>
 <div class="storage-note">💾 기록은 <b>이 브라우저</b>에 사람별로 따로 저장됩니다. 오른쪽 위 <b>사람 바꾸기</b>를 누르면 다른 사람의 칸으로 넘어갑니다.</div><div id="libraryBooks" class="books"></div>
 </section>
 
@@ -252,7 +272,13 @@ body{background:linear-gradient(135deg,#f4f0e6,#eef4ec 55%,#e8eee8);color:#26352
 </section>
 
 <section id="growth" class="page">
-<h2>📊 나의 독서 성장</h2><div class="cards"><div class="card"><div class="label">읽은 책</div><div class="num" id="g-books">0권</div></div><div class="card"><div class="label">총 독서 시간</div><div class="num" id="g-time">0m</div></div><div class="card"><div class="label">작성 기록</div><div class="num" id="g-entries">0개</div></div><div class="card"><div class="label">연속 독서</div><div class="num" id="g-streak">0일</div></div></div>
+<h2>📊 나의 독서 성장</h2>
+<div id="growBig" class="growbox big"></div>
+<div class="section"><h2>자라는 단계</h2><div id="growSteps" class="steps"></div></div>
+<div class="testbox">🧪 <b>테스트용</b> — 기록이 쌓이면 어떻게 자라는지 바로 봅니다.
+ <button class="secondary" onclick="addSampleRecord()">예시 기록 하나 넣기</button>
+ <span class="label">내 기록에 섞이지 않게 하려면 오른쪽 위 <b>사람 바꾸기</b>로 테스트용 이름을 쓰세요.</span></div>
+<div class="cards"><div class="card"><div class="label">읽은 책</div><div class="num" id="g-books">0권</div></div><div class="card"><div class="label">총 독서 시간</div><div class="num" id="g-time">0m</div></div><div class="card"><div class="label">작성 기록</div><div class="num" id="g-entries">0개</div></div><div class="card"><div class="label">연속 독서</div><div class="num" id="g-streak">0일</div></div></div>
 <div class="section card"><h2>이번 달 목표 · 10권</h2><div class="bar"><i id="goalBar" style="width:0%"></i></div><p class="label" id="goalText">0 / 10권</p></div>
 </section>
 </main>
@@ -362,6 +388,71 @@ function renderMonthly(records){
  const total=months.reduce((a,x)=>a+x.minutes,0);document.getElementById('monthTotal').textContent=`6개월 ${Math.floor(total/60)}시간 ${total%60}분`;
  const cur=months[5],list=[...cur.books];document.getElementById('monthBooks').innerHTML=list.length?list.map(x=>`<div style="padding:8px 0;border-bottom:1px solid #edf0ed">📖 <b>${esc(x)}</b></div>`).join(''):'<div class="label">이번 달 기록된 책이 아직 없어요.</div>';
 }
+/* ── 성장 ─────────────────────────────────────────────────────
+   기록이 쌓이면 자란다. 정해진 그림이 오면 face 와 name 만 바꾼다.
+   at = 이 단계가 되는 데 필요한 기록 수.                        */
+const GROWTH=[
+ {at:0,  face:'🌰', name:'씨앗',      말:'아직 심기 전이에요'},
+ {at:1,  face:'🌱', name:'새싹',      말:'첫 기록이 싹을 틔웠어요'},
+ {at:3,  face:'🌿', name:'떡잎',      말:'잎이 두 장 났어요'},
+ {at:6,  face:'🪴', name:'어린 나무', 말:'화분이 좁아 보여요'},
+ {at:10, face:'🌳', name:'나무',      말:'그늘이 생겼어요'},
+ {at:15, face:'🌲', name:'솔이',      말:'솔이가 다 자랐어요'}
+];
+function growthOf(n){
+ let i=0; GROWTH.forEach((g,k)=>{if(n>=g.at)i=k});
+ return {지금:GROWTH[i], 다음:GROWTH[i+1]||null, 번호:i};
+}
+function renderGrowth(records){
+ const n=records.length, g=growthOf(n);
+ const 남은=g.다음?g.다음.at-n:0;
+ const 폭=g.다음?Math.round((n-g.지금.at)/(g.다음.at-g.지금.at)*100):100;
+ const 몸='<div class="growface">'+g.지금.face+'</div>'
+  +'<div class="growtext"><b>'+esc(g.지금.name)+'</b>'
+  +'<p>'+esc(g.지금.말)+'</p>'
+  +'<div class="bar"><i style="width:'+폭+'%"></i></div>'
+  +'<small>'+(g.다음?'다음 «'+esc(g.다음.name)+'» 까지 기록 '+남은+'개':'끝까지 자랐어요 · 기록 '+n+'개')+'</small>'
+  +'</div>';
+ ['growHome','growBig'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=몸});
+ const 줄=document.getElementById('growSteps');
+ if(줄) 줄.innerHTML=GROWTH.map((x,k)=>
+  '<div class="step'+(k===g.번호?' now':'')+(k<g.번호?' done':'')+'">'
+  +'<span>'+x.face+'</span><b>'+esc(x.name)+'</b><small>기록 '+x.at+'개</small></div>').join('');
+}
+
+/* ── 내가 추가한 책 ───────────────────────────────────────────
+   기록이 없어도 보관함에 두고 싶은 책. 기록에서 나온 책과 합쳐서 보여준다. */
+function getBooks(){try{return JSON.parse(localStorage.getItem(K('books'))||'[]')}catch(e){return []}}
+function saveBooks(a){try{localStorage.setItem(K('books'),JSON.stringify(a))}catch(e){}}
+function addBook(){
+ const name=prompt('보관함에 둘 책 제목을 넣으세요.','');
+ if(name===null)return;
+ const t=name.trim(); if(!t){alert('제목을 넣어주세요.');return}
+ const a=getBooks();
+ if(a.includes(t)){alert('이미 보관함에 있는 책입니다.');return}
+ a.push(t); saveBooks(a);
+ renderLibraryFallback();
+ show('library',null);
+}
+function removeBook(name){
+ if(!confirm('«'+name+'» 을 보관함에서 뺄까요?\n저장된 독서 기록은 지워지지 않습니다.'))return;
+ saveBooks(getBooks().filter(x=>x!==name));
+ renderLibraryFallback();
+}
+
+/* 테스트용. 기록이 쌓일 때 무엇이 달라지는지 그 자리에서 보려고 둔다. */
+function addSampleRecord(){
+ const 후보=[...new Set([...getRecordsSync().map(r=>r.bookTitle),...getBooks()])];
+ const 책=후보.length?후보[Math.floor(Math.random()*후보.length)]:'예시 책';
+ const arr=getRecordsSync();
+ arr.push({bookTitle:책,range:'',quote:'',thought:'테스트로 넣은 기록',
+  duration:600+Math.floor(Math.random()*1800),noise:'없음',
+  createdAt:new Date().toISOString(),id:Date.now()+Math.random()});
+ try{localStorage.setItem(K('records'),JSON.stringify(arr))}catch(e){}
+ renderLibraryFallback();
+}
+function getRecordsSync(){try{return JSON.parse(localStorage.getItem(K('records'))||'[]')}catch(e){return []}}
+
 function hhmm(min){return min>=60?Math.floor(min/60)+'h '+(min%60)+'m':min+'m'}
 /* 오늘(또는 어제)부터 거슬러 올라가며 기록이 끊기지 않은 날 수 */
 function streakDays(records){
@@ -390,6 +481,7 @@ function renderStats(records){
  const bar=document.getElementById('goalBar');
  if(bar)bar.style.width=Math.min(100,달책.length*10)+'%';
  set('guestName',GUEST);
+ renderGrowth(records);
  /* 홈의 최근 보관함 — 마지막에 읽은 세 권 */
  const box=document.getElementById('homeBooks');
  if(!box)return;
@@ -476,11 +568,11 @@ async function renderLibraryFallback(){
  renderStats(records);
  const grouped={};records.forEach(r=>(grouped[r.bookTitle]??=[]).push(r));
  const completed=JSON.parse(localStorage.getItem(K('completed'))||'{}');
- const names=Object.keys(grouped);
+ const names=[...new Set([...Object.keys(grouped),...getBooks()])];
  if(!names.length){box.innerHTML='<div class="empty">아직 저장된 독서 기록이 없습니다.<br>첫 독서를 시작해보세요 📖</div>';return}
  box.innerHTML=names.map(name=>{
   const rs=grouped[name]||[],done=!!completed[name],icon='📚';
-  return `<div class="bookcard" data-name="${esc(name)}" onclick="openBook('${jsq(name)}')"><div class="cover">${icon}</div><b>${esc(name)}</b><small>${rs.length}개 기록 · 누적 ${Math.round(rs.reduce((a,r)=>a+(r.duration||0),0)/60)}분</small><div class="book-actions"><span class="pill">${done?'완독 ✓':'읽는 중'}</span><button class="complete ${done?'done':''}" onclick="event.stopPropagation();toggleComplete('${jsq(name)}')">${done?'완독 취소':'✓ 완독'}</button></div></div>`;
+  return `<div class="bookcard" data-name="${esc(name)}" onclick="openBook('${jsq(name)}')"><div class="cover">${icon}</div><b>${esc(name)}</b><small>${rs.length?rs.length+'개 기록 · 누적 '+Math.round(rs.reduce((a,r)=>a+(r.duration||0),0)/60)+'분':'아직 기록이 없어요'}</small><div class="book-actions"><span class="pill">${done?'완독 ✓':'읽는 중'}</span><button class="complete ${done?'done':''}" onclick="event.stopPropagation();toggleComplete('${jsq(name)}')">${done?'완독 취소':'✓ 완독'}</button></div></div>`;
  }).join('');
 }
 /* ── 독서 세션 ────────────────────────────────────────────────
