@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>청소년 아르바이트와 근로기준법 — 법과 사회 수행평가</title>
+    <script src="vendor/gsap.min.js"></script>
+    <style>
+      /* 본문 서체 — 이 덱에 쓰인 글자만 담은 서브셋(약 39KB) */
+      /* FONT:START — `npm run font` 이 이 구간을 다시 써넣는다. 손으로 고치지 말 것 */
+      @font-face {
+        font-family: 'Noto Sans KR';
+        font-style: normal;
+        font-weight: 400;
+        src: url(assets/fonts/noto-sans-kr-0.woff2) format('woff2');
+        unicode-range: U+22-23, U+26-29, U+2c-3b, U+3d, U+3f, U+41, U+44-46, U+49, U+52-54, U+58, U+5b, U+5d, U+5f, U+61-69, U+6b-70, U+72-75, U+77-79, U+7b, U+7d-7e, U+b7, U+2014, U+2500, U+260e, U+ac00, U+ac04, U+ac10, U+ac16, U+ac19, U+ac1c, U+ac70, U+ac74, U+ac83, U+ac8c, U+acbc, U+acc4, U+ace0, U+acfc, U+ad00, U+ad50, U+ad6c-ad6d, U+ad8c, U+adf8, U+adfc, U+ae08-ae09, U+ae30, U+ae38, U+ae4c, U+ae4e, U+afbc, U+b098, U+b0b4, U+b118, U+b144, U+b178, U+b294, U+b2a5, U+b2d8, U+b2e4, U+b2e8, U+b2f4, U+b2f9, U+b300, U+b3c4-b3c5, U+b3cc, U+b3d9, U+b418, U+b41c, U+b458, U+b4dc, U+b4e0, U+b4e4, U+b4f1, U+b54c, U+b5bc, U+b611, U+b77c, U+b78c, U+b7fc, U+b824, U+b85c-b85d, U+b8cc, U+b8e8, U+b978, U+b97c, U+b9ac, U+b9c8, U+b9cc, U+b9d0, U+ba3c, U+ba74, U+ba85, U+ba87, U+baa8, U+bb34, U+bb38, U+bb3c, U+bbf8, U+bc14, U+bc18, U+bc1b, U+bc24, U+bc88, U+bc95, U+bcbd, U+bcf4, U+bcf8, U+bcfc, U+bd80, U+bd84, U+be44, U+c0ac, U+c0b0, U+c0b4, U+c0bd, U+c0c1, U+c0c8, U+c0dd, U+c11c, U+c131, U+c138, U+c158, U+c18c, U+c190, U+c218, U+c2ac, U+c2dc, U+c2e0, U+c2e4, U+c2ec, U+c368, U+c529, U+c544, U+c548, U+c54a, U+c54c, U+c57c-c57d, U+c5b4-c5b5, U+c5c5-c5c6, U+c5d0, U+c5ec, U+c608, U+c628, U+c640, U+c678, U+c6a9, U+c6d0, U+c6d4, U+c704, U+c73c, U+c740, U+c744, U+c758, U+c774-c775, U+c778, U+c77c, U+c784-c785, U+c788, U+c790-c791, U+c7a5, U+c800-c801, U+c804, U+c808, U+c811, U+c815, U+c81c, U+c870, U+c8fc, U+c900, U+c99d, U+c9c0-c9c1, U+c9c4, U+c9c8, U+cc3e, U+ccad, U+ccb4, U+cd08, U+cd5c, U+cd9c, U+cde8, U+ce58-ce59, U+ce68-ce69, U+cef4, U+d130, U+d138, U+d1a4, U+d1f4, U+d3ec, U+d488, U+d558-d559, U+d55c, U+d560, U+d569, U+d574-d575, U+d588, U+d5c8, U+d654, U+d658, U+d68c, U+d6a8;
+      }
+      @font-face {
+        font-family: 'Noto Sans KR';
+        font-style: normal;
+        font-weight: 500;
+        src: url(assets/fonts/noto-sans-kr-0.woff2) format('woff2');
+        unicode-range: U+22-23, U+26-29, U+2c-3b, U+3d, U+3f, U+41, U+44-46, U+49, U+52-54, U+58, U+5b, U+5d, U+5f, U+61-69, U+6b-70, U+72-75, U+77-79, U+7b, U+7d-7e, U+b7, U+2014, U+2500, U+260e, U+ac00, U+ac04, U+ac10, U+ac16, U+ac19, U+ac1c, U+ac70, U+ac74, U+ac83, U+ac8c, U+acbc, U+acc4, U+ace0, U+acfc, U+ad00, U+ad50, U+ad6c-ad6d, U+ad8c, U+adf8, U+adfc, U+ae08-ae09, U+ae30, U+ae38, U+ae4c, U+ae4e, U+afbc, U+b098, U+b0b4, U+b118, U+b144, U+b178, U+b294, U+b2a5, U+b2d8, U+b2e4, U+b2e8, U+b2f4, U+b2f9, U+b300, U+b3c4-b3c5, U+b3cc, U+b3d9, U+b418, U+b41c, U+b458, U+b4dc, U+b4e0, U+b4e4, U+b4f1, U+b54c, U+b5bc, U+b611, U+b77c, U+b78c, U+b7fc, U+b824, U+b85c-b85d, U+b8cc, U+b8e8, U+b978, U+b97c, U+b9ac, U+b9c8, U+b9cc, U+b9d0, U+ba3c, U+ba74, U+ba85, U+ba87, U+baa8, U+bb34, U+bb38, U+bb3c, U+bbf8, U+bc14, U+bc18, U+bc1b, U+bc24, U+bc88, U+bc95, U+bcbd, U+bcf4, U+bcf8, U+bcfc, U+bd80, U+bd84, U+be44, U+c0ac, U+c0b0, U+c0b4, U+c0bd, U+c0c1, U+c0c8, U+c0dd, U+c11c, U+c131, U+c138, U+c158, U+c18c, U+c190, U+c218, U+c2ac, U+c2dc, U+c2e0, U+c2e4, U+c2ec, U+c368, U+c529, U+c544, U+c548, U+c54a, U+c54c, U+c57c-c57d, U+c5b4-c5b5, U+c5c5-c5c6, U+c5d0, U+c5ec, U+c608, U+c628, U+c640, U+c678, U+c6a9, U+c6d0, U+c6d4, U+c704, U+c73c, U+c740, U+c744, U+c758, U+c774-c775, U+c778, U+c77c, U+c784-c785, U+c788, U+c790-c791, U+c7a5, U+c800-c801, U+c804, U+c808, U+c811, U+c815, U+c81c, U+c870, U+c8fc, U+c900, U+c99d, U+c9c0-c9c1, U+c9c4, U+c9c8, U+cc3e, U+ccad, U+ccb4, U+cd08, U+cd5c, U+cd9c, U+cde8, U+ce58-ce59, U+ce68-ce69, U+cef4, U+d130, U+d138, U+d1a4, U+d1f4, U+d3ec, U+d488, U+d558-d559, U+d55c, U+d560, U+d569, U+d574-d575, U+d588, U+d5c8, U+d654, U+d658, U+d68c, U+d6a8;
+      }
+      @font-face {
+        font-family: 'Noto Sans KR';
+        font-style: normal;
+        font-weight: 700;
+        src: url(assets/fonts/noto-sans-kr-0.woff2) format('woff2');
+        unicode-range: U+22-23, U+26-29, U+2c-3b, U+3d, U+3f, U+41, U+44-46, U+49, U+52-54, U+58, U+5b, U+5d, U+5f, U+61-69, U+6b-70, U+72-75, U+77-79, U+7b, U+7d-7e, U+b7, U+2014, U+2500, U+260e, U+ac00, U+ac04, U+ac10, U+ac16, U+ac19, U+ac1c, U+ac70, U+ac74, U+ac83, U+ac8c, U+acbc, U+acc4, U+ace0, U+acfc, U+ad00, U+ad50, U+ad6c-ad6d, U+ad8c, U+adf8, U+adfc, U+ae08-ae09, U+ae30, U+ae38, U+ae4c, U+ae4e, U+afbc, U+b098, U+b0b4, U+b118, U+b144, U+b178, U+b294, U+b2a5, U+b2d8, U+b2e4, U+b2e8, U+b2f4, U+b2f9, U+b300, U+b3c4-b3c5, U+b3cc, U+b3d9, U+b418, U+b41c, U+b458, U+b4dc, U+b4e0, U+b4e4, U+b4f1, U+b54c, U+b5bc, U+b611, U+b77c, U+b78c, U+b7fc, U+b824, U+b85c-b85d, U+b8cc, U+b8e8, U+b978, U+b97c, U+b9ac, U+b9c8, U+b9cc, U+b9d0, U+ba3c, U+ba74, U+ba85, U+ba87, U+baa8, U+bb34, U+bb38, U+bb3c, U+bbf8, U+bc14, U+bc18, U+bc1b, U+bc24, U+bc88, U+bc95, U+bcbd, U+bcf4, U+bcf8, U+bcfc, U+bd80, U+bd84, U+be44, U+c0ac, U+c0b0, U+c0b4, U+c0bd, U+c0c1, U+c0c8, U+c0dd, U+c11c, U+c131, U+c138, U+c158, U+c18c, U+c190, U+c218, U+c2ac, U+c2dc, U+c2e0, U+c2e4, U+c2ec, U+c368, U+c529, U+c544, U+c548, U+c54a, U+c54c, U+c57c-c57d, U+c5b4-c5b5, U+c5c5-c5c6, U+c5d0, U+c5ec, U+c608, U+c628, U+c640, U+c678, U+c6a9, U+c6d0, U+c6d4, U+c704, U+c73c, U+c740, U+c744, U+c758, U+c774-c775, U+c778, U+c77c, U+c784-c785, U+c788, U+c790-c791, U+c7a5, U+c800-c801, U+c804, U+c808, U+c811, U+c815, U+c81c, U+c870, U+c8fc, U+c900, U+c99d, U+c9c0-c9c1, U+c9c4, U+c9c8, U+cc3e, U+ccad, U+ccb4, U+cd08, U+cd5c, U+cd9c, U+cde8, U+ce58-ce59, U+ce68-ce69, U+cef4, U+d130, U+d138, U+d1a4, U+d1f4, U+d3ec, U+d488, U+d558-d559, U+d55c, U+d560, U+d569, U+d574-d575, U+d588, U+d5c8, U+d654, U+d658, U+d68c, U+d6a8;
+      }
+      @font-face {
+        font-family: 'Noto Sans KR';
+        font-style: normal;
+        font-weight: 900;
+        src: url(assets/fonts/noto-sans-kr-0.woff2) format('woff2');
+        unicode-range: U+22-23, U+26-29, U+2c-3b, U+3d, U+3f, U+41, U+44-46, U+49, U+52-54, U+58, U+5b, U+5d, U+5f, U+61-69, U+6b-70, U+72-75, U+77-79, U+7b, U+7d-7e, U+b7, U+2014, U+2500, U+260e, U+ac00, U+ac04, U+ac10, U+ac16, U+ac19, U+ac1c, U+ac70, U+ac74, U+ac83, U+ac8c, U+acbc, U+acc4, U+ace0, U+acfc, U+ad00, U+ad50, U+ad6c-ad6d, U+ad8c, U+adf8, U+adfc, U+ae08-ae09, U+ae30, U+ae38, U+ae4c, U+ae4e, U+afbc, U+b098, U+b0b4, U+b118, U+b144, U+b178, U+b294, U+b2a5, U+b2d8, U+b2e4, U+b2e8, U+b2f4, U+b2f9, U+b300, U+b3c4-b3c5, U+b3cc, U+b3d9, U+b418, U+b41c, U+b458, U+b4dc, U+b4e0, U+b4e4, U+b4f1, U+b54c, U+b5bc, U+b611, U+b77c, U+b78c, U+b7fc, U+b824, U+b85c-b85d, U+b8cc, U+b8e8, U+b978, U+b97c, U+b9ac, U+b9c8, U+b9cc, U+b9d0, U+ba3c, U+ba74, U+ba85, U+ba87, U+baa8, U+bb34, U+bb38, U+bb3c, U+bbf8, U+bc14, U+bc18, U+bc1b, U+bc24, U+bc88, U+bc95, U+bcbd, U+bcf4, U+bcf8, U+bcfc, U+bd80, U+bd84, U+be44, U+c0ac, U+c0b0, U+c0b4, U+c0bd, U+c0c1, U+c0c8, U+c0dd, U+c11c, U+c131, U+c138, U+c158, U+c18c, U+c190, U+c218, U+c2ac, U+c2dc, U+c2e0, U+c2e4, U+c2ec, U+c368, U+c529, U+c544, U+c548, U+c54a, U+c54c, U+c57c-c57d, U+c5b4-c5b5, U+c5c5-c5c6, U+c5d0, U+c5ec, U+c608, U+c628, U+c640, U+c678, U+c6a9, U+c6d0, U+c6d4, U+c704, U+c73c, U+c740, U+c744, U+c758, U+c774-c775, U+c778, U+c77c, U+c784-c785, U+c788, U+c790-c791, U+c7a5, U+c800-c801, U+c804, U+c808, U+c811, U+c815, U+c81c, U+c870, U+c8fc, U+c900, U+c99d, U+c9c0-c9c1, U+c9c4, U+c9c8, U+cc3e, U+ccad, U+ccb4, U+cd08, U+cd5c, U+cd9c, U+cde8, U+ce58-ce59, U+ce68-ce69, U+cef4, U+d130, U+d138, U+d1a4, U+d1f4, U+d3ec, U+d488, U+d558-d559, U+d55c, U+d560, U+d569, U+d574-d575, U+d588, U+d5c8, U+d654, U+d658, U+d68c, U+d6a8;
+      }
+      /* FONT:END */
+
+      /* OS 기본 한글 폰트 — 웹폰트가 늦게 오면 이 순서로 대체된다 */
+      @font-face {
+        font-family: "Apple SD Gothic Neo";
+        src: local("Apple SD Gothic Neo");
+      }
+      @font-face {
+        font-family: "Malgun Gothic";
+        src: local("Malgun Gothic");
+      }
+
+      :root {
+        --ink: #f2f4f8;
+        --dim: #9aa4b2;
+        --line: rgba(255, 255, 255, 0.12);
+        --amber: #ffc93c;
+        --mint: #5fe3b3;
+        --bg: #0a0c11;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Noto Sans KR", system-ui, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .scene {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background:
+          radial-gradient(1200px 700px at 78% -10%, rgba(255, 201, 60, 0.13), transparent 62%),
+          radial-gradient(900px 620px at 4% 108%, rgba(95, 227, 179, 0.1), transparent 60%),
+          var(--bg);
+      }
+
+      /* 얇은 그리드 — 배경 질감 */
+      .grid {
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(var(--line) 1px, transparent 1px),
+          linear-gradient(90deg, var(--line) 1px, transparent 1px);
+        background-size: 160px 160px;
+        opacity: 0.35;
+      }
+
+      .clip {
+        position: absolute;
+        inset: 0;
+      }
+
+      .pad {
+        position: absolute;
+        inset: 0;
+        padding: 96px 120px;
+        box-sizing: border-box;
+      }
+
+      .eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        font-size: 40px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        color: var(--amber);
+      }
+
+      .eyebrow .tick {
+        display: block;
+        width: 76px;
+        height: 8px;
+        border-radius: 4px;
+        background: var(--amber);
+        transform-origin: left center;
+      }
+
+      .headline {
+        margin: 40px 0 0;
+        font-size: 88px;
+        font-weight: 900;
+        line-height: 1.2;
+        letter-spacing: -0.02em;
+        max-width: 1000px;
+      }
+
+      .headline.wide {
+        max-width: 1560px;
+      }
+
+      .headline .hl {
+        color: var(--amber);
+      }
+
+      .sub {
+        margin: 32px 0 0;
+        font-size: 44px;
+        font-weight: 500;
+        line-height: 1.5;
+        color: var(--dim);
+        max-width: 980px;
+      }
+
+      /* 슬라이드 1 — 오른쪽 숫자 패널 */
+      .figure {
+        position: absolute;
+        top: 150px;
+        right: 120px;
+        width: 600px;
+        padding: 44px 44px 40px;
+        box-sizing: border-box;
+        border: 2px solid rgba(255, 201, 60, 0.45);
+        border-radius: 32px;
+        background: rgba(255, 201, 60, 0.07);
+        text-align: right;
+      }
+
+      .figure .cap {
+        font-size: 38px;
+        font-weight: 700;
+        color: var(--amber);
+      }
+
+      .figure .num {
+        margin-top: 10px;
+        font-size: 124px;
+        font-weight: 900;
+        line-height: 1.05;
+        letter-spacing: -0.04em;
+        white-space: nowrap;
+      }
+
+      .figure .unit {
+        font-size: 60px;
+        font-weight: 700;
+      }
+
+      .figure .foot {
+        margin-top: 16px;
+        font-size: 32px;
+        font-weight: 500;
+        color: var(--dim);
+        line-height: 1.45;
+      }
+
+      /* 팩트 칩 */
+      .chips {
+        position: absolute;
+        left: 120px;
+        right: 120px;
+        bottom: 150px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 28px;
+      }
+
+      .chip {
+        padding: 34px 36px;
+        border-radius: 24px;
+        border: 2px solid var(--line);
+        background: rgba(255, 255, 255, 0.04);
+        opacity: 0;
+      }
+
+      .chip .k {
+        font-size: 34px;
+        font-weight: 900;
+        color: var(--mint);
+        letter-spacing: 0.04em;
+      }
+
+      .chip .v {
+        margin-top: 14px;
+        font-size: 42px;
+        font-weight: 700;
+        line-height: 1.36;
+      }
+
+      .chip .n {
+        margin-top: 14px;
+        font-size: 30px;
+        font-weight: 500;
+        color: var(--dim);
+        line-height: 1.4;
+      }
+
+      /* 슬라이드 2 — 3단계 카드 */
+      .steps {
+        position: absolute;
+        left: 120px;
+        right: 120px;
+        top: 396px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 32px;
+      }
+
+      .step {
+        position: relative;
+        padding: 38px 36px 40px;
+        border-radius: 28px;
+        border: 2px solid var(--line);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
+        opacity: 0;
+      }
+
+      .step .no {
+        font-size: 34px;
+        font-weight: 900;
+        color: var(--bg);
+        background: var(--amber);
+        width: 62px;
+        height: 62px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+      }
+
+      .step .t {
+        margin-top: 22px;
+        font-size: 46px;
+        font-weight: 900;
+        line-height: 1.25;
+      }
+
+      .step .d {
+        margin-top: 16px;
+        font-size: 32px;
+        font-weight: 500;
+        color: var(--dim);
+        line-height: 1.5;
+      }
+
+      .step .hot {
+        margin-top: 18px;
+        font-size: 38px;
+        font-weight: 900;
+        color: var(--mint);
+      }
+
+      .tip {
+        position: absolute;
+        left: 120px;
+        right: 120px;
+        bottom: 128px;
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        padding: 30px 36px;
+        border-radius: 20px;
+        border: 2px solid rgba(95, 227, 179, 0.4);
+        background: rgba(95, 227, 179, 0.08);
+        font-size: 34px;
+        font-weight: 700;
+        line-height: 1.4;
+        opacity: 0;
+      }
+
+      .tip .badge {
+        flex: none;
+        font-size: 30px;
+        font-weight: 900;
+        color: var(--bg);
+        background: var(--mint);
+        padding: 10px 20px;
+        border-radius: 999px;
+      }
+
+      .source {
+        position: absolute;
+        left: 120px;
+        bottom: 60px;
+        font-size: 28px;
+        font-weight: 500;
+        color: #8b96a5;
+      }
+
+      .pageno {
+        position: absolute;
+        right: 120px;
+        bottom: 60px;
+        font-size: 28px;
+        font-weight: 700;
+        color: #8b96a5;
+        letter-spacing: 0.1em;
+      }
+    </style>
+  </head>
+  <body>
+    <script type="application/hyperframes-slideshow+json">
+      {
+        "slides": [
+          {
+            "sceneId": "rights",
+            "notes": "여는 말: '이 교실에서 알바 해본 사람?' 손 들게 하고 시작. 핵심은 미성년자라고 최저임금이 깎이지 않는다는 것 — 2026년 시급 10,320원은 나이와 무관하게 동일하다. 칩 세 개는 하나씩 넘기면서: (1) 만 15세부터, 13~14세는 취직인허증 (2) 하루 7시간·주 35시간, 합의해도 하루 8시간·주 40시간이 상한 (3) 밤 10시~새벽 6시는 원칙 금지. 근거 조문은 근로기준법 제64조·제69조·제70조.",
+            "fragments": [2.0, 3.7, 5.3, 6.9]
+          },
+          {
+            "sceneId": "action",
+            "notes": "전환 문장: '그럼 어겼을 때는?' 여기서 톤을 바꾼다 — 권리를 아는 것과 되찾는 것은 다른 문제. 3단계를 하나씩: (1) 증거는 신고보다 먼저다 — 계약서·급여명세서·출퇴근 기록·사장님과의 문자 (2) 1350은 무료이고 익명 상담도 된다 (3) 진정은 온라인으로도 접수된다. 마무리 한 문장: 근로계약서를 안 써준 것 자체가 이미 법 위반이다. 질문 받기.",
+            "fragments": [11.0, 12.7, 14.3, 15.9]
+          }
+        ]
+      }
+    </script>
+
+    <!-- ── 슬라이드 1 ── 최저임금·근로시간 -->
+    <div
+      id="s1"
+      class="scene"
+      data-composition-id="rights"
+      data-start="0"
+      data-duration="9"
+      data-label="알바생의 권리"
+      data-width="1920"
+      data-height="1080"
+    >
+      <div class="grid"></div>
+
+      <section id="s1-body" class="clip" data-start="0" data-duration="9" data-track-index="1">
+        <div class="pad">
+          <div class="eyebrow"><span class="tick" id="s1-tick"></span><span id="s1-eyebrow">법과 사회 · 청소년 노동</span></div>
+          <h1 class="headline" id="s1-head">
+            미성년자라고 시급을 깎는 것은 <span class="hl">합의해도 무효다</span>
+          </h1>
+          <p class="sub" id="s1-sub">
+            최저임금법은 근로자의 나이를 구분하지 않는다. 고등학생도 어른과 똑같은 시급을 받는다.
+          </p>
+        </div>
+
+        <aside class="figure" id="s1-fig">
+          <div class="cap">2026년 최저임금</div>
+          <div class="num">10,320<span class="unit">원</span></div>
+          <div class="foot">2026년 1월 1일부터 모든 사업장에 동일 적용</div>
+        </aside>
+
+        <div class="chips">
+          <div class="chip" id="s1-c1">
+            <div class="k">몇 살부터</div>
+            <div class="v">만 15세부터 일할 수 있다</div>
+            <div class="n">13~14세는 고용노동부장관의 취직인허증이 있어야 가능</div>
+          </div>
+          <div class="chip" id="s1-c2">
+            <div class="k">몇 시간까지</div>
+            <div class="v">하루 7시간 · 주 35시간</div>
+            <div class="n">본인이 합의해도 하루 8시간, 주 40시간을 넘길 수 없다</div>
+          </div>
+          <div class="chip" id="s1-c3">
+            <div class="k">밤에는</div>
+            <div class="v">밤 10시~새벽 6시 근로는 원칙 금지</div>
+            <div class="n">본인 동의와 고용노동부 인가가 둘 다 있어야 예외로 가능</div>
+          </div>
+        </div>
+
+        <div class="source">근거 · 최저임금법, 근로기준법 제64조·제69조·제70조 / 고용노동부</div>
+        <div class="pageno">01 / 02</div>
+      </section>
+    </div>
+
+    <!-- ── 슬라이드 2 ── 침해당했을 때의 대응 -->
+    <div
+      id="s2"
+      class="scene"
+      data-composition-id="action"
+      data-start="9"
+      data-duration="9"
+      data-label="대응 3단계"
+      data-width="1920"
+      data-height="1080"
+    >
+      <div class="grid"></div>
+
+      <section id="s2-body" class="clip" data-start="9" data-duration="9" data-track-index="1">
+        <div class="pad">
+          <div class="eyebrow"><span class="tick" id="s2-tick"></span><span id="s2-eyebrow">권리 침해를 당했다면</span></div>
+          <h1 class="headline wide" id="s2-head">
+            떼인 알바비는 <span class="hl">신고하면 돌려받을 수 있다</span>
+          </h1>
+        </div>
+
+        <div class="steps">
+          <div class="step" id="s2-p1">
+            <div class="no">1</div>
+            <div class="t">증거부터 모은다</div>
+            <div class="d">근로계약서, 급여명세서, 출퇴근 기록, 사장님과 주고받은 문자. 신고보다 증거가 먼저다.</div>
+          </div>
+          <div class="step" id="s2-p2">
+            <div class="no">2</div>
+            <div class="t">1350에 전화한다</div>
+            <div class="d">고용노동부 상담전화. 무료이고, 익명으로도 물어볼 수 있다.</div>
+            <div class="hot">☎ 국번 없이 1350</div>
+          </div>
+          <div class="step" id="s2-p3">
+            <div class="no">3</div>
+            <div class="t">진정을 접수한다</div>
+            <div class="d">고용노동부 노동포털에서 온라인 접수. 근로감독관이 조사해 시정을 지시한다.</div>
+          </div>
+        </div>
+
+        <div class="tip" id="s2-tip">
+          <span class="badge">기억할 것</span>
+          <span>근로계약서를 써주지 않은 것 자체가 이미 법 위반이다. 서면으로 2부 작성해 한 부는 내가 갖는다.</span>
+        </div>
+
+        <div class="source">근거 · 근로기준법 제17조(근로조건 명시), 제36조(금품 청산) / 고용노동부 노동포털</div>
+        <div class="pageno">02 / 02</div>
+      </section>
+    </div>
+
+    <script>
+      const EASE = "power3.out";
+
+      function buildDecks() {
+        // ── 슬라이드 1 (0~9초)
+        const a = gsap.timeline({ paused: true });
+        a.fromTo("#s1-tick", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: EASE }, 0.2);
+        a.fromTo("#s1-eyebrow", { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.5, ease: EASE }, 0.35);
+        a.fromTo("#s1-head", { opacity: 0, y: 34 }, { opacity: 1, y: 0, duration: 0.7, ease: EASE }, 0.5);
+        a.fromTo("#s1-sub", { opacity: 0, y: 22 }, { opacity: 1, y: 0, duration: 0.6, ease: EASE }, 0.9);
+        a.fromTo("#s1-fig", { opacity: 0, y: 30, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.7, ease: EASE }, 1.1);
+        a.fromTo("#s1-c1", { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.5, ease: EASE }, 3.2);
+        a.fromTo("#s1-c2", { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.5, ease: EASE }, 4.8);
+        a.fromTo("#s1-c3", { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.5, ease: EASE }, 6.4);
+
+        // ── 슬라이드 2 (9~18초) — 삽입 위치는 컴포지션 절대 시간
+        const b = gsap.timeline({ paused: true });
+        b.fromTo("#s2-tick", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: EASE }, 9.2);
+        b.fromTo("#s2-eyebrow", { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.5, ease: EASE }, 9.35);
+        b.fromTo("#s2-head", { opacity: 0, y: 34 }, { opacity: 1, y: 0, duration: 0.7, ease: EASE }, 9.5);
+        b.fromTo("#s2-p1", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.5, ease: EASE }, 12.2);
+        b.fromTo("#s2-p2", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.5, ease: EASE }, 13.8);
+        b.fromTo("#s2-p3", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.5, ease: EASE }, 15.4);
+        b.fromTo("#s2-tip", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: EASE }, 15.4);
+
+        window.__timelines["rights"] = a;
+        window.__timelines["action"] = b;
+        if (window.__hfForceTimelineRebind) window.__hfForceTimelineRebind();
+      }
+
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(buildDecks);
+      } else {
+        buildDecks();
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "name": "teen-labor-law",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npx --yes hyperframes@0.8.30 present .",
+    "studio": "npx --yes hyperframes@0.8.30 preview",
+    "check": "npx --yes hyperframes@0.8.30 check",
+    "font": "python3 scripts/refresh-font.py"
+  }
+}
