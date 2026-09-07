@@ -54,6 +54,26 @@ table.prep td:first-child{width:34%;white-space:nowrap;color:#3c6845}
 .guestbox b{color:#26352c}
 .guestbox button{border:1px solid #cfdccd;background:#fff;color:#3c6845;
  border-radius:10px;padding:7px 11px;font-size:12px;font-weight:800;cursor:pointer}
+/* ── 친구와 나누기 ── */
+.sharebox{background:#fff;border:1px solid #e5eae5;border-radius:20px;
+ padding:22px;max-width:700px}
+.cardview{background:#f2f7f1;border:1px solid #d9e6d8;border-radius:18px;padding:20px}
+.cardview .who{font-size:13px;color:#4a6e57;font-weight:800}
+.cardview h3{margin:6px 0 2px;font-size:21px}
+.cardview .meta{font-size:13px;color:#6b7a70;margin-top:4px}
+.cardview .quote{background:#fff;border:1px solid #e2ebe1}
+.sharebtns{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.sharebtns button{flex:1;min-width:140px}
+.friendcard{background:#fff;border:1px solid #e5eae5;border-radius:18px;padding:16px;
+ position:relative}
+.friendcard .who{font-size:12px;color:#4a6e57;font-weight:800}
+.friendcard b{display:block;font-size:16px;margin:5px 0 2px}
+.friendcard small{display:block;color:#808b83}
+.friendcard .drop{position:absolute;top:11px;right:11px;border:0;background:#f1f4f0;
+ color:#8b968d;border-radius:9px;padding:4px 8px;font-size:12px;cursor:pointer}
+.friendsum{display:flex;gap:9px;flex-wrap:wrap;margin:14px 0 4px}
+.friendsum .pill{background:#edf5ea;color:#3c6845;border-radius:20px;
+ padding:8px 13px;font-size:13px;font-weight:800}
 @media(max-width:800px){.sidebar{display:none}.content{margin:0;width:100%;padding:18px 15px 82px}.cards{grid-template-columns:1fr 1fr}.books{grid-template-columns:1fr 1fr}.hero{display:block}.hero button{margin-top:15px;width:100%}.mobile-nav{display:grid;position:fixed;z-index:5;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e3e8e2;grid-template-columns:repeat(5,1fr);padding:7px}.mobile-nav button{border:0;background:transparent;font-size:10px;color:#78847b}.mobile-nav button b{display:block;font-size:19px;margin-bottom:2px}.noisegrid{grid-template-columns:1fr 1fr}.top h1{font-size:23px}}
 </style>
 
@@ -101,6 +121,7 @@ body{background:linear-gradient(135deg,#f4f0e6,#eef4ec 55%,#e8eee8);color:#26352
 <button class="sidebtn" onclick="show('reading',this)">📖 독서 시작</button>
 <button class="sidebtn" onclick="show('record',this)">📝 기록하기</button>
 <button class="sidebtn" onclick="show('library',this)">📚 보관함</button>
+<button class="sidebtn" onclick="show('friends',this)">👫 친구 책장</button>
 <button class="sidebtn" onclick="show('growth',this)">📊 나의 성장</button>
 <button class="sidebtn" onclick="show('nfcsetup',this)">🔕 NFC 설정</button>
 </aside>
@@ -150,13 +171,49 @@ body{background:linear-gradient(135deg,#f4f0e6,#eef4ec 55%,#e8eee8);color:#26352
 
 <section id="library" class="page">
 <h2>📚 나의 독서 보관함</h2><div class="storage-note">💾 독서 시간·책·기록·완독 상태가 이 브라우저에 저장됩니다.</div><p class="label">책마다 독서 기록이 따로 쌓입니다. 책을 누르면 해당 책의 포트폴리오를 확인할 수 있어요.</p>
-<div class="toolbar"><input placeholder="책 제목 검색..." oninput="filterBooks(this.value)"><button class="secondary" onclick="addBook()">＋ 책 추가</button></div>
+<div class="toolbar"><input placeholder="책 제목 검색..." oninput="filterBooks(this.value)"><button class="secondary" onclick="addBook()">＋ 책 추가</button><button class="secondary" onclick="show('friends',null)">👫 친구 책장</button></div>
 <div class="storage-note">💾 기록은 <b>이 브라우저</b>에 사람별로 따로 저장됩니다. 오른쪽 위 <b>사람 바꾸기</b>를 누르면 다른 사람의 칸으로 넘어갑니다.</div><div id="libraryBooks" class="books"></div>
 </section>
 
 <section id="bookdetail" class="page">
 <button class="secondary" onclick="show('library',null)">← 보관함으로</button>
+<button class="secondary" onclick="shareBook(activeBook)">📤 이 책 카드 공유</button>
 <div class="detail section"><div class="detailhead"><div class="detailcover">📘</div><div><h2 id="detailTitle">데미안</h2><div class="label">나의 독서 포트폴리오</div><div style="margin-top:8px" id="detailMeta"></div></div></div>
+</div>
+</section>
+
+<section id="friends" class="page">
+<h2>👫 친구 책장</h2>
+<p class="label">친구가 보내 준 독서 카드가 여기에 모입니다. 카드는 <b>이 기기</b>에만 담기고, 내 독서 기록·통계와는 섞이지 않습니다.</p>
+<div class="storage-note">📤 내 책을 보내려면 <b>보관함 ▸ 책 ▸ 이 책 카드 공유</b> 를 누르세요. 링크가 만들어집니다.</div>
+<div id="friendSum" class="friendsum"></div>
+<div id="friendCards" class="books" style="margin-top:12px"></div>
+</section>
+
+<section id="share" class="page">
+<button class="secondary" onclick="show('bookdetail',null)">← 돌아가기</button>
+<div class="sharebox section">
+<h2>📤 이 카드를 친구에게</h2>
+<div id="shareCardView" class="cardview"></div>
+<div class="sharebtns">
+ <button class="primary" onclick="shareCard()">공유하기</button>
+ <button class="secondary" onclick="copyURL('shareLink',this)">링크 복사</button>
+</div>
+<div class="urlrow"><code id="shareLink"></code></div>
+<div class="warnbox">🔓 이 링크를 받은 사람은 <b>누구나</b> 이 카드를 볼 수 있습니다. 링크 안에 카드 내용이 통째로 들어 있어서, 한 번 보내면 <b>되돌릴 수 없습니다.</b> 남에게 보이면 안 되는 생각은 빼고 보내세요.</div>
+<p class="label" id="shareCut"></p>
+</div>
+</section>
+
+<section id="shared" class="page">
+<div class="sharebox section">
+<h2 id="sharedHead">👋 친구의 독서 카드</h2>
+<div id="sharedCardView" class="cardview"></div>
+<div class="sharebtns">
+ <button class="primary" onclick="keepShared()">👫 친구 책장에 담기</button>
+ <button class="secondary" onclick="dropShared()">내 앱으로</button>
+</div>
+<p class="label">담아도 내 독서 기록·통계에는 섞이지 않습니다.</p>
 </div>
 </section>
 
@@ -316,7 +373,7 @@ let timerSec=0,running=false,timerId=null,currentNoise=null;
 function show(id,btn){
  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
  document.getElementById(id).classList.add('active');
- const titles={home:'오늘도 한 페이지부터.',reading:'독서에 몰입하는 시간',record:'오늘의 독서 기록',library:'나의 독서 보관함',bookdetail:'책별 독서 포트폴리오',growth:'나의 독서 성장',nfcsetup:'NFC 태그 설정'};
+ const titles={home:'오늘도 한 페이지부터.',reading:'독서에 몰입하는 시간',record:'오늘의 독서 기록',library:'나의 독서 보관함',bookdetail:'책별 독서 포트폴리오',growth:'나의 독서 성장',friends:'친구 책장',share:'카드 보내기',shared:'친구가 보낸 카드',nfcsetup:'NFC 태그 설정'};
  document.getElementById('title').textContent=titles[id]||'BOOK-COK';
  document.querySelectorAll('.sidebtn').forEach(x=>x.classList.remove('active'));
  if(btn && btn.classList.contains('sidebtn'))btn.classList.add('active');
@@ -496,6 +553,7 @@ function renderStats(records){
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function jsq(s){return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'")}
 
+let activeBook='';
 async function openBook(name){
  activeBook=name;
  document.getElementById('detailTitle').textContent=name;
@@ -525,7 +583,7 @@ function filterBooks(q){q=q.toLowerCase();document.querySelectorAll('#libraryBoo
 async function initStorage(){
  /* 저장은 localStorage 하나뿐이다. 켤 때 화면을 한 번 그리고 주소를 채운다. */
  try{await renderLibraryFallback()}catch(e){console.error(e)}
- readEntry();
+ if(!readShared()) readEntry();
  document.getElementById('urlStart').textContent=startURL();
  document.getElementById('urlDone').textContent=doneURL();
  document.getElementById('urlTag').textContent=tagURL();
@@ -542,6 +600,7 @@ async function renderLibraryFallback(){
  const records=await getRecordsSafe(),box=document.getElementById('libraryBooks');
  if(typeof renderMonthly==='function') renderMonthly(records);
  renderStats(records);
+ renderFriends();
  const grouped={};records.forEach(r=>(grouped[r.bookTitle]??=[]).push(r));
  const completed=JSON.parse(localStorage.getItem(K('completed'))||'{}');
  const names=[...new Set([...Object.keys(grouped),...getBooks()])];
@@ -651,6 +710,131 @@ function readEntry(){
  const 이어감=getSession();
  if(이어감&&이어감.byTag) enteredByNFC=true;
  if(enteredByNFC||이어감){startReading(이어감?(이어감.book||책):책);return}
+}
+
+/* ── 친구와 나누기 ────────────────────────────────────────────
+   이 앱에는 서버가 없다. 그래서 카드를 '보내는' 것이 아니라,
+   카드 내용을 통째로 담은 주소를 만들어 그 주소를 보낸다.
+   주소의 # 뒤는 서버로 가지 않으므로 어디에도 기록이 남지 않는다.
+   받은 사람은 그 주소를 열면 카드를 보고, 담으면 자기 기기에 저장된다. */
+
+const CARD_MAX=200;                       /* 친구 책장에 담아 두는 카드 수 */
+const CUT={u:20,t:60,q:100,g:150};        /* 주소가 길어지지 않게 자르는 길이 */
+
+function cut(v,n){const t=String(v==null?'':v).trim();return t.length>n?t.slice(0,n)+'…':t}
+/* 한글은 btoa 가 그대로 못 먹는다. 바이트로 바꾼 뒤 주소에 쓸 수 있는 글자로 만든다. */
+function packCard(o){
+ const bytes=new TextEncoder().encode(JSON.stringify(o));
+ let bin=''; bytes.forEach(b=>bin+=String.fromCharCode(b));
+ return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function unpackCard(s){
+ try{
+  const b=atob(String(s).replace(/-/g,'+').replace(/_/g,'/'));
+  const bytes=Uint8Array.from(b,c=>c.charCodeAt(0));
+  return JSON.parse(new TextDecoder().decode(bytes));
+ }catch(e){return null}
+}
+/* 받은 것은 남이 만든 값이다. 믿지 않고 모양을 다시 맞춘다. */
+function cleanCard(c){
+ if(!c||typeof c!=='object')return null;
+ const num=(v,max)=>{const n=Math.floor(Number(v));return isFinite(n)&&n>0?Math.min(n,max):0};
+ const t=cut(c.t,CUT.t); if(!t)return null;
+ return {v:1,u:cut(c.u,CUT.u)||'이름 없음',t,
+  n:num(c.n,99999),m:num(c.m,999999),d:c.d?1:0,
+  q:cut(c.q,CUT.q),g:cut(c.g,CUT.g),
+  at:typeof c.at==='string'?cut(c.at,30):''};
+}
+/* 내 기록에서 책 한 권을 카드로 만든다 */
+function buildCard(name){
+ const rs=getRecordsSync().filter(r=>r.bookTitle===name);
+ const completed=JSON.parse(localStorage.getItem(K('completed'))||'{}');
+ const 최근=[...rs].sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt)));
+ const 문장=(최근.find(r=>r.quote)||{}).quote||'';
+ const 생각=(최근.find(r=>r.thought)||{}).thought||'';
+ return cleanCard({u:GUEST,t:name,n:rs.length,
+  m:Math.round(rs.reduce((a,r)=>a+(r.duration||0),0)/60),
+  d:!!completed[name],q:문장,g:생각,at:new Date().toISOString().slice(0,10)});
+}
+function cardHTML(c,mine){
+ return '<div class="who">'+(mine?'📤 보내는 사람':'👋')+' '+esc(c.u)+'</div>'
+  +'<h3>'+esc(c.t)+'</h3>'
+  +'<div class="meta">독서 기록 '+c.n+'개 · 누적 '+hhmm(c.m)+' · '+(c.d?'완독 ✓':'읽는 중')+'</div>'
+  +(c.q?'<div class="quote">“'+esc(c.q)+'”</div>':'')
+  +(c.g?'<div class="quote">'+esc(c.g)+'</div>':'')
+  +(c.at?'<div class="meta">'+esc(c.at)+'</div>':'');
+}
+let shareCardData=null;
+function shareBook(name){
+ if(!name){alert('먼저 보관함에서 책을 하나 열어 주세요.');return}
+ const c=buildCard(name);
+ if(!c){alert('카드를 만들지 못했습니다.');return}
+ if(!c.n && !confirm('«'+name+'» 에는 아직 저장된 기록이 없습니다.\n그래도 카드를 만들까요?'))return;
+ shareCardData=c;
+ const link=appURL()+'#c='+packCard(c);
+ document.getElementById('shareCardView').innerHTML=cardHTML(c,true);
+ document.getElementById('shareLink').textContent=link;
+ const 원문=buildCard(name);
+ const 잘림=(원문.q.endsWith('…')||원문.g.endsWith('…'));
+ document.getElementById('shareCut').textContent=
+  (잘림?'문장과 생각은 주소가 길어지지 않게 앞부분만 담았습니다. ':'')
+  +'카드에는 이 책의 기록 수·시간·완독 여부와 가장 최근 문장 하나만 들어갑니다.';
+ show('share',null);
+}
+function shareCard(){
+ const link=document.getElementById('shareLink').textContent;
+ const 글=shareCardData?shareCardData.u+' 님의 독서 카드 · '+shareCardData.t:'독서 카드';
+ if(navigator.share) navigator.share({title:'BOOK-COK 독서 카드',text:글,url:link}).catch(()=>{});
+ else copyURL('shareLink',document.querySelector('#share .sharebtns .primary'));
+}
+
+/* ── 받은 카드 ─────────────────────────────────────────────── */
+let incomingCard=null;
+function readShared(){
+ const m=/[#&]c=([A-Za-z0-9\-_]+)/.exec(location.hash);
+ if(!m)return false;
+ const c=cleanCard(unpackCard(m[1]));
+ history.replaceState(null,'',location.pathname+location.search);  /* 새로고침해도 다시 안 뜬다 */
+ if(!c){alert('카드를 읽지 못했습니다. 링크가 잘려서 왔을 수 있어요.');return false}
+ incomingCard=c;
+ document.getElementById('sharedHead').textContent='👋 '+c.u+' 님의 독서 카드';
+ document.getElementById('sharedCardView').innerHTML=cardHTML(c,false);
+ show('shared',null);
+ return true;
+}
+function friendKey(c){return c.u+'\u0000'+c.t}
+function getFriends(){try{return JSON.parse(localStorage.getItem(K('friends'))||'[]')}catch(e){return []}}
+function saveFriends(a){try{localStorage.setItem(K('friends'),JSON.stringify(a.slice(-CARD_MAX)))}catch(e){}}
+function keepShared(){
+ if(!incomingCard)return;
+ const a=getFriends().filter(x=>friendKey(x)!==friendKey(incomingCard));
+ a.push({...incomingCard,keptAt:Date.now()});
+ saveFriends(a); incomingCard=null;
+ renderFriends(); show('friends',null);
+}
+function dropShared(){incomingCard=null;show('home',null)}
+function removeFriend(u,t){
+ if(!confirm('«'+t+'» 카드를 책장에서 뺄까요?'))return;
+ saveFriends(getFriends().filter(x=>!(x.u===u&&x.t===t)));
+ renderFriends();
+}
+function renderFriends(){
+ const box=document.getElementById('friendCards'); if(!box)return;
+ const a=getFriends().slice().sort((x,y)=>(y.keptAt||0)-(x.keptAt||0));
+ const sum=document.getElementById('friendSum');
+ if(sum) sum.innerHTML=a.length
+  ? '<span class="pill">친구 '+new Set(a.map(x=>x.u)).size+'명</span>'
+   +'<span class="pill">책 '+new Set(a.map(x=>x.t)).size+'권</span>'
+   +'<span class="pill">함께 읽은 시간 '+hhmm(a.reduce((s,x)=>s+(x.m||0),0))+'</span>'
+  : '';
+ box.innerHTML=a.length?a.map(c=>
+  '<div class="friendcard">'
+  +'<button class="drop" onclick="removeFriend(\''+jsq(c.u)+'\',\''+jsq(c.t)+'\')">빼기</button>'
+  +'<div class="who">👋 '+esc(c.u)+'</div><b>'+esc(c.t)+'</b>'
+  +'<small>기록 '+(c.n||0)+'개 · '+hhmm(c.m||0)+' · '+(c.d?'완독 ✓':'읽는 중')+'</small>'
+  +(c.q?'<div class="quote">“'+esc(c.q)+'”</div>':'')
+  +'</div>').join('')
+  : '<div class="empty">아직 받은 카드가 없습니다.<br>친구에게 카드 링크를 받아 열어 보세요 👫</div>';
 }
 
 initStorage();
