@@ -352,33 +352,13 @@ async function saveRecord(){
  try{
   await addRecordSafe(record);
   alert('독서 기록이 저장되었습니다! 📚');
-  if(window.bookcokStorage==='indexeddb') await renderLibrary(); else await renderLibraryFallback();
+  await renderLibraryFallback();
   await openBook(title);
  }catch(e){console.error(e);alert('기록 저장에 실패했습니다.');}
 }
-async function getRecords(){
- return new Promise((resolve,reject)=>{
-  const req=db.transaction(STORE,'readonly').objectStore(STORE).getAll();
-  req.onsuccess=()=>resolve(req.result||[]);
-  req.onerror=()=>reject(req.error);
- });
-}
-async function renderLibrary(){
- const box=document.getElementById('libraryBooks'),records=await getRecordsSafe();renderMonthly(records);
- const grouped={};records.forEach(r=>(grouped[r.bookTitle]??=[]).push(r));
- const completed=JSON.parse(localStorage.getItem(K('completed'))||'{}');
- const demo=[['데미안','📘','5개 기록 · 132p','완독'],['아몬드','📗','4개 기록 · 98p','읽는 중'],['모모','📙','3개 기록 · 76p','완독'],['어린 왕자','📕','5개 기록 · 95p','완독']];
- let cards='';
- Object.entries(grouped).forEach(([name,rs])=>{
-  const minutes=Math.max(1,Math.round(rs.reduce((a,r)=>a+(r.duration||0),0)/60)),done=!!completed[name];
-  cards+=`<div class="bookcard" data-name="${esc(name)}" onclick="openBook('${jsq(name)}')"><div class="cover">📚</div><b>${esc(name)}</b><small>${rs.length}개 기록 · 누적 ${minutes}분</small><div class="book-actions"><span class="pill">${done?'완독 ✓':'읽는 중'}</span><button class="complete ${done?'done':''}" onclick="event.stopPropagation();toggleComplete('${jsq(name)}')">${done?'완독 취소':'✓ 완독'}</button></div></div>`;
- });
- demo.forEach(d=>{if(!grouped[d[0]]){const done=!!completed[d[0]];cards+=`<div class="bookcard" data-name="${d[0]}" onclick="openBook('${jsq(d[0])}')"><div class="cover">${d[1]}</div><b>${d[0]}</b><small>${d[2]}</small><div class="book-actions"><span class="pill">${done?'완독 ✓':d[3]}</span><button class="complete ${done?'done':''}" onclick="event.stopPropagation();toggleComplete('${jsq(d[0])}')">${done?'완독 취소':'✓ 완독'}</button></div></div>`}});
- box.innerHTML=cards||'<div class="empty">아직 저장된 독서 기록이 없습니다.<br>첫 독서를 시작해보세요 📖</div>';
-}
 function toggleComplete(name){
  const c=JSON.parse(localStorage.getItem(K('completed'))||'{}');c[name]=!c[name];if(!c[name])delete c[name];
- localStorage.setItem(K('completed'),JSON.stringify(c));renderLibrary();
+ localStorage.setItem(K('completed'),JSON.stringify(c));renderLibraryFallback();
 }
 function renderMonthly(records){
  const now=new Date(),months=[];
@@ -525,40 +505,18 @@ async function openBook(name){
 function filterBooks(q){q=q.toLowerCase();document.querySelectorAll('#libraryBooks .bookcard').forEach(c=>c.style.display=c.dataset.name.toLowerCase().includes(q)?'block':'none')}
 
 async function initStorage(){
- /* IndexedDB 쪽 코드는 openDB() 가 없어서 한 번도 동작한 적이 없다.
-    이제는 시도하지 않고 곧바로 localStorage 를 쓴다. */
- window.bookcokStorage='localStorage';
+ /* 저장은 localStorage 하나뿐이다. 켤 때 화면을 한 번 그리고 주소를 채운다. */
  try{await renderLibraryFallback()}catch(e){console.error(e)}
  readEntry();
  document.getElementById('urlStart').textContent=startURL();
  document.getElementById('urlDone').textContent=doneURL();
  document.getElementById('urlTag').textContent=tagURL();
- return;
- try{
-   if(!window.indexedDB) throw new Error('IndexedDB unavailable');
-   await openDB();
-   window.bookcokStorage='indexeddb';
-   await renderLibrary();
- }catch(e){
-   console.warn('IndexedDB unavailable. Falling back to localStorage.',e);
-   window.bookcokStorage='localStorage';
-   try{await renderLibraryFallback();}catch(err){console.error(err);}
- }
 }
 async function getRecordsSafe(){
- if(window.bookcokStorage==='indexeddb') return await getRecords();
- return JSON.parse(localStorage.getItem(K('records'))||'[]');
+ return getRecordsSync();
 }
 async function addRecordSafe(record){
- if(window.bookcokStorage==='indexeddb'){
-   return new Promise((resolve,reject)=>{
-     const tx=db.transaction(STORE,'readwrite');
-     tx.objectStore(STORE).add(record);
-     tx.oncomplete=resolve;
-     tx.onerror=()=>reject(tx.error);
-   });
- }
- const arr=JSON.parse(localStorage.getItem(K('records'))||'[]');
+ const arr=getRecordsSync();
  arr.push({...record,id:Date.now()+Math.random()});
  localStorage.setItem(K('records'),JSON.stringify(arr));
 }
