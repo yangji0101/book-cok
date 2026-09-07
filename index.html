@@ -330,6 +330,23 @@ function noise(name,btn){
  document.getElementById('noiseStatus').textContent='🎧 '+name+' 재생 중';
  document.getElementById('noiseLive').textContent='🔊 실제 백색소음 재생 중 · 볼륨은 기기에서 조절하세요.';
 }
+/* 한 번 저장했으면 다음 기록으로 새어 들어가지 않게 전부 비운다.
+   특히 timerSec — 안 비우면 나중에 기록 탭을 눌러 쓴 글에도
+   아까 읽은 시간이 그대로 붙는다. */
+function clearEntryForm(){
+ ['bookTitle','bookRange','bookQuote','bookThought'].forEach(id=>{
+  const el=document.getElementById(id); if(el)el.value='';
+ });
+ timerSec=0; resetNoise();
+}
+function resetNoise(){
+ currentNoise=null;
+ document.querySelectorAll('.noise button').forEach(b=>b.classList.remove('selected'));
+ const s=document.getElementById('noiseStatus');
+ if(s)s.textContent='백색소음을 선택해주세요.';
+ const l=document.getElementById('noiseLive');
+ if(l)l.textContent='🔈 백색소음 버튼을 누르면 실제 소리가 재생됩니다.';
+}
 function stopNoise(){noiseNodes.forEach(n=>{try{n.stop()}catch(e){}});noiseNodes=[];if(noiseGain){try{noiseGain.disconnect()}catch(e){}}}
 function startNoise(name){
  stopNoise(); audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();
@@ -351,6 +368,7 @@ async function saveRecord(){
  const record={bookTitle:title,range,quote,thought,duration:timerSec,noise:currentNoise||'없음',createdAt:new Date().toISOString()};
  try{
   await addRecordSafe(record);
+  clearEntryForm();
   alert('독서 기록이 저장되었습니다! 📚');
   await renderLibraryFallback();
   await openBook(title);
@@ -581,7 +599,7 @@ function updateDndBanner(){
 
 function startReading(book){
  const x=getSession();
- if(!x) saveSession({running:true,since:Date.now(),acc:0,book:book||'',byTag:enteredByNFC});
+ if(!x){ saveSession({running:true,since:Date.now(),acc:0,book:book||'',byTag:enteredByNFC}); timerSec=0; resetNoise(); }
  else if(!x.running) saveSession({...x,running:true,since:Date.now()});
  show('reading');
  clearInterval(timerId); timerId=setInterval(tick,1000); tick();
@@ -589,7 +607,7 @@ function startReading(book){
 }
 function pauseTimer(){
  const x=getSession(); if(!x)return;
- if(x.running) saveSession({running:false,acc:elapsedSec(),since:0,book:x.book});
+ if(x.running) saveSession({...x,running:false,acc:elapsedSec(),since:0});
  else saveSession({...x,running:true,since:Date.now()});
  tick(); updatePauseBtn();
 }
