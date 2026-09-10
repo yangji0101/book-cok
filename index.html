@@ -410,6 +410,7 @@ table.prep td:first-child{width:34%;white-space:nowrap;color:var(--brand-d);font
 <div class="top"><h1 id="title">오늘도 한 페이지부터.</h1><div class="guestbox"><button class="classpill" id="classPill" onclick="switchClass()">🏫 반 없음</button><span>🌲 <b id="guestName">게스트</b></span><button class="namebtn" onclick="switchGuest()">사람 바꾸기</button><button class="morebtn" onclick="show('more',null)" title="더보기">⚙️ <span>더보기</span></button></div></div>
 
 <div id="storageWarn"></div>
+<div id="linkNote"></div>
 
 <section id="home" class="page active">
 <div class="hero"><div><h2>📖 독서를 시작해볼까요?</h2><p>NFC 책갈피를 태그하면 몰입 환경과 백색소음이 준비됩니다.</p></div><div class="mascots" id="heroMascots"></div><button class="primary" onclick="startReading()">NFC 태그하고 독서 시작</button></div>
@@ -837,10 +838,27 @@ function showStorageWarning(e){
    처음 들어오면 손님 번호를 하나 만들어 이 브라우저에 적어 둔다.
    주소 뒤에 ?u=이름 을 붙이면 그 이름으로 따로 쌓인다.          */
 function newGuestId(){return Math.random().toString(36).slice(2,8)}
+/* ── 주소에 실려 온 이름·반 ───────────────────────────────────
+   링크를 받아서 들어오면 주소에 «누구» 가 들어 있을 수 있다.
+   그걸 그대로 받아들이면, 친구가 보낸 링크로 들어간 사람이
+   그 친구가 되어 버린다. 그래서 절대 조용히 갈아타지 않는다.
+     · 아직 등록 안 한 사람 → 등록 화면에 «채워만» 준다
+     · 이미 등록한 사람      → 물어본다 (기본은 내 계정 그대로)   */
+const 주소=new URLSearchParams(location.search);
+const urlU=(주소.get('u')||'').trim().slice(0,20);
+const urlC=주소.get('c')===null?null:주소.get('c').trim().slice(0,40);
+const 등록했나=get('bookcok_signed','')==='1';
+const 내이름=get('bookcok_guest','');
+const 내반=get('bookcok_class','');
+/* 남의 링크인가 — 이미 등록한 사람인데 주소가 다른 사람을 가리킨다 */
+let linkIdentity=null;
+if(등록했나 && ((urlU && urlU!==내이름) || (urlC!==null && urlC!==내반)))
+ linkIdentity={u:urlU, c:urlC};
+
 function guestId(){
- const q=new URLSearchParams(location.search).get('u');
- if(q){put('bookcok_guest',q);return q}
- let id=get('bookcok_guest','');
+ /* 등록을 마친 사람만 주소의 이름을 쓴다. 처음 온 사람은 등록 화면에서 확인한다. */
+ if(urlU && !linkIdentity && 등록했나){put('bookcok_guest',urlU);return urlU}
+ let id=내이름;
  if(!id){id=newGuestId();put('bookcok_guest',id)}
  return id;
 }
@@ -849,11 +867,20 @@ const GUEST=guestId();
    주소 뒤에 ?c=1반 을 붙이면 그 반의 칸을 쓴다. 반이 없으면 예전과
    똑같은 이름표를 쓴다 — 그래야 이미 쌓아 둔 기록이 그대로 남는다. */
 function classId(){
- const q=new URLSearchParams(location.search).get('c');
- if(q!==null){const v=q.trim().slice(0,40);put('bookcok_class',v);return v}
- return get('bookcok_class','').trim().slice(0,40);
+ if(urlC!==null && !linkIdentity && 등록했나){put('bookcok_class',urlC);return urlC}
+ return 내반.trim().slice(0,40);
 }
 const CLASS=classId();
+/* 읽었으면 주소창에서 지운다. 그래야 이 주소를 복사해 보내도
+   내 이름이 따라가지 않는다. 태그 정보(src·dnd·book·done)는 남긴다. */
+(function cleanURL(){
+ if(!주소.has('u') && !주소.has('c'))return;
+ const q=new URLSearchParams(location.search);
+ q.delete('u'); q.delete('c');
+ const t=q.toString();
+ /* # 뒤(친구 카드)는 반드시 남긴다 — 지우면 카드가 안 열린다 */
+ try{history.replaceState(null,'',location.pathname+(t?'?'+t:'')+location.hash)}catch(e){}
+})();
 /* 저장 이름표. 반이나 사람이 바뀌면 통째로 다른 칸을 쓴다. */
 const K=n=>'bookcok_'+n+'__'+(CLASS?CLASS+'__':'')+GUEST;
 /* 반이 없던 시절의 이름표. 기록을 가져올 때만 쓴다. */
@@ -878,10 +905,10 @@ let pick={school:'',grade:0,room:0};
 function isSigned(){return get('bookcok_signed','')==='1'}
 function needSignup(){
  if(isSigned())return false;
- /* 주소가 반과 이름을 둘 다 들고 왔으면 물어볼 것이 없다. 바로 등록해 준다. */
- const q=new URLSearchParams(location.search);
- if(q.get('u') && q.get('c')!==null){put('bookcok_signed','1');return false}
- if(CLASS)return true;                       /* 반 주소로 들어왔으면 이름만 받으면 된다 */
+ /* 주소에 이름이 실려 있어도 그냥 등록시키지 않는다. 등록 화면에서
+    본인이 확인해야 한다 — 안 그러면 친구 링크로 들어온 사람이
+    그 친구가 되어 버린다. */
+ if(urlU || urlC!==null) return true;
  return getRecordsSync().length===0 && getBooks().length===0 && getFriends().length===0;
 }
 /* 저장 칸 이름이 되는 한 줄. 예: '세종고 3-2' */
@@ -947,13 +974,23 @@ function signNext(){ signStep===3 ? doSignup() : signSkip() }
 function signPrev(){ signGo(signStep-1) }
 function renderSignup(){
  pick={school:get('bookcok_school',''),grade:+get('bookcok_grade',0)||0,room:+get('bookcok_room',0)||0};
+ /* 링크가 반을 들고 왔으면 채워만 준다. 이름은 본인이 넣어야 한다. */
+ if(!isSigned() && urlC){
+  const m=/^(.*?)\s*(\d+)-(\d+)$/.exec(urlC);
+  if(m){pick={school:m[1].trim(),grade:+m[2],room:+m[3]}}
+  else if(!pick.school){pick.school=urlC}
+ }
  const el=document.getElementById('schoolSearch'); if(el)el.value=pick.school;
  const nm=document.getElementById('signName'); if(nm)nm.value=isSigned()?GUEST:'';
  searchSchool(pick.school);
+ const 반이정해짐=!isSigned() && urlC && pick.school && pick.grade && pick.room;
  document.getElementById('signSub').textContent=isSigned()
   ? '바꾸면 그 반의 새 칸을 씁니다. 지금 칸의 기록은 지워지지 않습니다.'
-  : '학교와 반을 고르면 반 친구들과 따로 기록이 쌓입니다. 한 번만 하면 됩니다.';
- signGo(0);
+  : 반이정해짐
+   ? '반은 링크에 들어 있었어요. 이름만 넣으면 됩니다.'
+   : '학교와 반을 고르면 반 친구들과 따로 기록이 쌓입니다. 한 번만 하면 됩니다.';
+ /* 반까지 정해진 링크로 왔으면 이름만 물어본다 */
+ signGo(반이정해짐?3:0);
 }
 function doSignup(){
  const name=(document.getElementById('signName').value||'').trim().slice(0,20);
@@ -967,10 +1004,12 @@ function doSignup(){
  put('bookcok_guest',name);
  put('bookcok_signed','1');
  put('bookcok_skiplogin','1');
- /* 태그로 들어온 사람이 여기서 등록했으면 태그 정보를 잃지 않고 넘겨준다 */
+ /* 태그 정보는 넘기되 이름·반은 주소에 남기지 않는다.
+    남기면 이 주소를 복사해 보낸 친구가 내가 되어 버린다. */
  const q=new URLSearchParams(location.search);
- q.set('c',scope); q.set('u',name);
- location.href=location.pathname+'?'+q.toString();
+ q.delete('u'); q.delete('c');
+ const t=q.toString();
+ location.href=location.pathname+(t?'?'+t:'');
 }
 function switchClass(){renderSignup();show('signup',null)}
 /* 반에 처음 들어왔는데 반 없이 쌓아 둔 기록이 있으면 가져올 수 있게 한다 */
@@ -995,7 +1034,7 @@ function switchGuest(){
  if(name===null)return;
  const id=name.trim()||newGuestId();
  put('bookcok_guest',id);
- location.href=location.pathname+'?'+classQ()+'u='+encodeURIComponent(id);
+ location.href=location.pathname;
 }
 
 let timerSec=0,running=false,timerId=null,currentNoise=null;
@@ -1537,6 +1576,7 @@ async function initStorage(){
  if(needSignup()){renderSignup();show('signup',null);return}
  rememberProfile();
  renderMoreLabels();
+ renderLinkNote();
  /* 공용 기기 모드면 열 때마다 누구인지 묻는다 */
  if(askLogin() && get('bookcok_skiplogin','')!=='1' && getProfiles().length){showLogin();return}
  del('bookcok_skiplogin');
@@ -1953,6 +1993,28 @@ function setPin(){
  saveProfiles(a);
  alert(t?'잠금번호를 정했습니다.':'잠금을 풀었습니다.');
 }
+/* 남의 링크로 들어왔을 때 — 조용히 갈아타지 않고 물어본다 */
+function renderLinkNote(){
+ const el=document.getElementById('linkNote'); if(!el)return;
+ if(!linkIdentity){el.innerHTML='';return}
+ const 그사람=[linkIdentity.c||'', linkIdentity.u||''].filter(Boolean).join(' · ');
+ const 나=[CLASS||'', GUEST||''].filter(Boolean).join(' · ');
+ el.innerHTML='<div class="classnote">🔗 <b>친구가 보낸 링크로 들어왔어요.</b><br>'
+  +'이 링크는 «'+esc(그사람)+'» 의 것입니다. 지금은 «'+esc(나)+'» 로 쓰고 있어요.<br>'
+  +'<b>기록은 사람마다 따로 쌓입니다.</b> 그대로 두면 내 기록이 안전합니다.'
+  +'<br><button class="secondary" onclick="keepMine()">내 계정 그대로</button>'
+  +'<button class="secondary" onclick="acceptLink()">이 링크의 사람으로 바꾸기</button></div>';
+}
+function keepMine(){linkIdentity=null;renderLinkNote()}
+function acceptLink(){
+ if(!linkIdentity)return;
+ const 그사람=[linkIdentity.c||'', linkIdentity.u||''].filter(Boolean).join(' · ');
+ if(!confirm('«'+그사람+'» 으로 바꿀까요?\n지금 내 기록은 지워지지 않고 그대로 남습니다.'))return;
+ if(linkIdentity.u) put('bookcok_guest',linkIdentity.u);
+ if(linkIdentity.c!==null) put('bookcok_class',linkIdentity.c);
+ put('bookcok_skiplogin','1');
+ location.href=location.pathname;
+}
 function showLogin(){renderLogin();show('login',null)}
 function renderLogin(){
  const box=document.getElementById('profileList'); if(!box)return;
@@ -1978,9 +2040,7 @@ function loginAs(id){
  put('bookcok_guest',me.name); put('bookcok_class',me.scope||'');
  put('bookcok_school',me.school||''); put('bookcok_grade',me.grade||''); put('bookcok_room',me.room||'');
  put('bookcok_signed','1'); put('bookcok_skiplogin','1');
- const q=new URLSearchParams(location.search);
- q.set('c',me.scope||''); q.set('u',me.name);
- location.href=location.pathname+'?'+q.toString();
+ location.href=location.pathname;
 }
 function startNewProfile(){put('bookcok_skiplogin','1');renderSignup();show('signup',null)}
 
