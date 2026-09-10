@@ -56,7 +56,10 @@ table.prep td:first-child{width:34%;white-space:nowrap;color:#3c6845}
 .classpill.none{background:#fff;border-color:#e0e4de;color:#8b968d}
 .classnote{background:#edf5ea;border:1px solid #cadfc7;border-radius:14px;
  padding:13px 16px;margin:12px 0 0;font-size:14px;line-height:1.7;color:#3c6845}
-.classnote button{margin-top:9px}
+.classnote button{margin-top:9px;margin-right:7px}
+.readtime{font-size:14px;font-weight:800;color:#3c6845;background:#edf5ea;
+ border-radius:12px;padding:11px 14px;margin-bottom:6px}
+.readtime:empty{display:none}
 .roomlist{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:7px}
 .roombtn{background:#fff;border:1px solid #dfe6df;border-radius:13px;padding:15px 12px;
  font-weight:800;color:#3c6845;cursor:pointer;text-align:center}
@@ -145,10 +148,13 @@ body{background:linear-gradient(135deg,#f4f0e6,#eef4ec 55%,#e8eee8);color:#26352
 <main class="content">
 <div class="top"><h1 id="title">오늘도 한 페이지부터.</h1><div class="guestbox"><button class="classpill" id="classPill" onclick="switchClass()">🏫 반 없음</button><span>🌲 <b id="guestName">게스트</b></span><button onclick="switchGuest()">사람 바꾸기</button></div></div>
 
+<div id="storageWarn"></div>
+
 <section id="home" class="page active">
 <div class="hero"><div><h2>📖 독서를 시작해볼까요?</h2><p>NFC 책갈피를 태그하면 몰입 환경과 백색소음이 준비됩니다.</p></div><div class="mascots">
 <div class="mascot sol"><div class="quill"></div><div class="body"></div><div class="face"><i class="eye e1"></i><i class="eye e2"></i><i class="nose"></i></div><div class="label">솔이 🌲</div></div>
 <div class="mascot kuk"><div class="petal"></div><div class="center"></div><div class="body"></div><div class="face"><i class="eye e1"></i><i class="eye e2"></i><i class="nose"></i></div><div class="label">국이 🌼</div></div></div><button class="primary" onclick="startReading()">NFC 태그하고 독서 시작</button></div>
+<div id="pendNote"></div>
 <div id="growHome" class="growbox"></div>
 <div class="cards">
 <div class="card"><div class="label">이번 달 독서</div><div class="num" id="st-books">0권</div><div class="label">이번 달 읽은 책</div></div>
@@ -177,6 +183,7 @@ body{background:linear-gradient(135deg,#f4f0e6,#eef4ec 55%,#e8eee8);color:#26352
 
 <section id="record" class="page">
 <div class="recordform"><h2>📝 독서 기록</h2>
+<div id="recordTime" class="readtime"></div>
 <div id="dndOff"></div>
 <label>책 제목</label><input id="bookTitle" class="input" placeholder="예: 데미안">
 <label>읽은 범위</label><input id="bookRange" class="input" placeholder="예: 32p ~ 57p">
@@ -421,6 +428,32 @@ function classId(){
 const CLASS=classId();
 /* 저장 이름표. 반이나 사람이 바뀌면 통째로 다른 칸을 쓴다. */
 const K=n=>'bookcok_'+n+'__'+(CLASS?CLASS+'__':'')+GUEST;
+/* ── 저장 ─────────────────────────────────────────────────────
+   localStorage 는 조용히 실패할 때가 있다 (사파리 사생활 보호,
+   저장 공간 꽉 참). 실패를 삼키면 '저장했다' 고 말해 놓고 사라진다.
+   그래서 여기 한 곳으로 모으고, 실패하면 화면에 대고 말한다.      */
+let storageBroken=false;
+function put(key,value){
+ try{localStorage.setItem(key,value);storageBroken=false;return true}
+ catch(e){storageBroken=true;showStorageWarning(e);return false}
+}
+function get(key,fallback){
+ try{const v=localStorage.getItem(key);return v===null?fallback:v}
+ catch(e){storageBroken=true;return fallback}
+}
+function del(key){try{localStorage.removeItem(key)}catch(e){}}
+function readJSON(key,fallback){
+ try{return JSON.parse(get(key,'')||JSON.stringify(fallback))}catch(e){return fallback}
+}
+function showStorageWarning(e){
+ const el=document.getElementById('storageWarn'); if(!el)return;
+ const 꽉참=e&&(e.name==='QuotaExceededError'||/quota/i.test(e.message||''));
+ el.innerHTML='<div class="warnbox">⚠️ <b>이 기기에 저장하지 못했습니다.</b><br>'
+  +(꽉참
+   ? '저장 공간이 꽉 찼습니다. 오래된 기록을 지우거나 다른 앱의 자료를 정리해 주세요.'
+   : '사파리 <b>사생활 보호 모드</b>에서는 저장이 막힙니다. 일반 탭에서 열어 주세요.')
+  +'</div>';
+}
 /* 반이 없던 시절의 이름표. 기록을 가져올 때만 쓴다. */
 const K0=n=>'bookcok_'+n+'__'+GUEST;
 function classQ(){return CLASS?'c='+encodeURIComponent(CLASS)+'&':''}
@@ -435,6 +468,9 @@ function isSigned(){try{return localStorage.getItem('bookcok_signed')==='1'}catc
 /* 처음 온 사람에게만 등록 화면을 보여 준다. 이미 쓰던 사람은 건드리지 않는다. */
 function needSignup(){
  if(isSigned())return false;
+ /* 주소가 반과 이름을 둘 다 들고 왔으면 물어볼 것이 없다. 바로 등록해 준다. */
+ const q=new URLSearchParams(location.search);
+ if(q.get('u') && q.get('c')!==null){put('bookcok_signed','1');return false}
  if(CLASS)return true;                       /* 반 주소로 들어왔으면 이름만 받으면 된다 */
  return getRecordsSync().length===0 && getBooks().length===0;
 }
@@ -534,7 +570,9 @@ function clearEntryForm(){
  ['bookTitle','bookRange','bookQuote','bookThought'].forEach(id=>{
   const el=document.getElementById(id); if(el)el.value='';
  });
- timerSec=0; resetNoise();
+ timerSec=0; resetNoise(); clearPending();
+ const rt=document.getElementById('recordTime'); if(rt)rt.textContent='';
+ const pn=document.getElementById('pendNote'); if(pn)pn.innerHTML='';
 }
 function resetNoise(){
  currentNoise=null;
@@ -617,8 +655,8 @@ function renderGrowth(records){
 
 /* ── 내가 추가한 책 ───────────────────────────────────────────
    기록이 없어도 보관함에 두고 싶은 책. 기록에서 나온 책과 합쳐서 보여준다. */
-function getBooks(){try{return JSON.parse(localStorage.getItem(K('books'))||'[]')}catch(e){return []}}
-function saveBooks(a){try{localStorage.setItem(K('books'),JSON.stringify(a))}catch(e){}}
+function getBooks(){return readJSON(K('books'),[])}
+function saveBooks(a){put(K('books'),JSON.stringify(a))}
 function addBook(){
  const name=prompt('보관함에 둘 책 제목을 넣으세요.','');
  if(name===null)return;
@@ -646,7 +684,7 @@ function addSampleRecord(){
  try{localStorage.setItem(K('records'),JSON.stringify(arr))}catch(e){}
  renderLibraryFallback();
 }
-function getRecordsSync(){try{return JSON.parse(localStorage.getItem(K('records'))||'[]')}catch(e){return []}}
+function getRecordsSync(){return readJSON(K('records'),[])}
 
 function hhmm(min){return min>=60?Math.floor(min/60)+'h '+(min%60)+'m':min+'m'}
 /* 오늘(또는 어제)부터 거슬러 올라가며 기록이 끊기지 않은 날 수 */
@@ -740,7 +778,7 @@ async function getRecordsSafe(){
 async function addRecordSafe(record){
  const arr=getRecordsSync();
  arr.push({...record,id:Date.now()+Math.random()});
- localStorage.setItem(K('records'),JSON.stringify(arr));
+ if(!put(K('records'),JSON.stringify(arr))) throw new Error('저장 실패');
 }
 async function renderLibraryFallback(){
  const records=await getRecordsSafe(),box=document.getElementById('libraryBooks');
@@ -764,8 +802,8 @@ async function renderLibraryFallback(){
 /* ── 독서 세션 ────────────────────────────────────────────────
    단축어가 주소를 열면 페이지가 새로 뜬다. 그때 읽은 시간이 사라지지 않게
    '언제 시작했는지' 를 저장해 두고, 화면에는 계산해서 보여준다.        */
-function getSession(){try{return JSON.parse(localStorage.getItem(K('session'))||'null')}catch(e){return null}}
-function saveSession(x){try{x?localStorage.setItem(K('session'),JSON.stringify(x)):localStorage.removeItem(K('session'))}catch(e){}}
+function getSession(){return readJSON(K('session'),null)}
+function saveSession(x){x?put(K('session'),JSON.stringify(x)):del(K('session'))}
 function elapsedSec(){
  const x=getSession(); if(!x) return 0;
  return Math.floor((x.acc||0)+(x.running?(Date.now()-x.since)/1000:0));
@@ -824,6 +862,37 @@ function pauseTimer(){
 function updatePauseBtn(){
  const b=document.getElementById('pauseBtn'); if(b)b.textContent=isRunning()?'일시정지':'▶ 이어서 읽기';
 }
+/* ── 쓰다 만 기록 ─────────────────────────────────────────────
+   독서를 끝내면 세션은 지워진다. 그런데 아이폰에서는 그 직후 단축어로
+   화면이 넘어가고, 방해금지를 끈 단축어가 ?done=1 로 이 페이지를 다시
+   연다. 그때 세션이 이미 없으니 읽은 시간도 책 이름도 사라져서, 학생은
+   기록을 쓸 기회를 통째로 잃었다. 그래서 넘어가기 전에 적어 둔다.     */
+const PEND_LIFE=12*60*60*1000;              /* 반나절 지나면 버린다 */
+const fieldVal=id=>{const el=document.getElementById(id);return el?el.value:''};
+function savePending(){
+ if(!timerSec && !fieldVal('bookTitle')) return;
+ put(K('pending'),JSON.stringify({
+  duration:timerSec, book:fieldVal('bookTitle'), range:fieldVal('bookRange'),
+  quote:fieldVal('bookQuote'), thought:fieldVal('bookThought'),
+  noise:currentNoise||'없음', at:Date.now()}));
+}
+function loadPending(){
+ const x=readJSON(K('pending'),null);
+ if(!x||typeof x!=='object')return null;
+ if(Date.now()-(x.at||0)>PEND_LIFE){clearPending();return null}
+ return x;
+}
+function clearPending(){del(K('pending'))}
+function restorePending(x){
+ timerSec=Math.max(0,Math.floor(Number(x.duration)||0));
+ currentNoise=(x.noise&&x.noise!=='없음')?x.noise:null;
+ const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||''};
+ set('bookTitle',x.book); set('bookRange',x.range);
+ set('bookQuote',x.quote); set('bookThought',x.thought);
+ const el=document.getElementById('recordTime');
+ if(el)el.textContent=timerSec?'⏱️ 이번에 읽은 시간 '+fmt(timerSec):'';
+}
+
 /* byUser 가 참일 때만 단축어를 부른다. 태그로 끝난 것은 '누른 것' 이 아니다. */
 function finishReading(byUser){
  timerSec=elapsedSec();
@@ -831,7 +900,10 @@ function finishReading(byUser){
  clearInterval(timerId); saveSession(null); stopNoise();
  document.getElementById('bookRange').value='';
  if(x&&x.book) document.getElementById('bookTitle').value=x.book;
+ const rt=document.getElementById('recordTime');
+ if(rt)rt.textContent=timerSec?'⏱️ 이번에 읽은 시간 '+fmt(timerSec):'';
  show('record');
+ savePending();
  /* 아이폰만 단축어로 끌 수 있다. 안드로이드는 앱이 부를 것이 없다. */
  if(byUser&&enteredByNFC&&isIOS()){runEndShortcut();return}
  const off=document.getElementById('dndOff'); if(!off)return;
@@ -854,6 +926,8 @@ function readEntry(){
   /* 독서 끝 단축어가 방해금지를 끄고 이 주소로 돌아왔다 */
   enteredByNFC=false;
   if(getSession()){finishReading(false);return}
+  const 쓰다만=loadPending();
+  if(쓰다만){restorePending(쓰다만);show('record',null);return}
   show('home',null);return;
  }
  /* 폰이 잠겼다 풀려 페이지가 다시 떠도 '태그로 시작했다'는 사실은 남아야 한다.
@@ -861,6 +935,22 @@ function readEntry(){
  const 이어감=getSession();
  if(이어감&&이어감.byTag) enteredByNFC=true;
  if(enteredByNFC||이어감){startReading(이어감?(이어감.book||책):책);return}
+ /* 쓰다 만 기록이 남아 있으면 홈에서 알려 준다. 그냥 두면 학생은
+    읽은 시간을 잃어버린 줄 안다. */
+ const 쓰다만=loadPending();
+ if(쓰다만){
+  restorePending(쓰다만);
+  const el=document.getElementById('pendNote');
+  if(el)el.innerHTML='<div class="classnote">📝 <b>쓰다 만 기록이 있어요.</b> '
+   +(쓰다만.duration?fmt(쓰다만.duration)+' 읽은 것까지 그대로 남아 있습니다.':'')
+   +'<br><button class="secondary" onclick="show(\'record\',null)">이어서 기록 쓰기</button>'
+   +'<button class="secondary" onclick="dropPending()">버리기</button></div>';
+ }
+}
+function dropPending(){
+ if(!confirm('쓰다 만 기록을 버릴까요?'))return;
+ clearPending(); clearEntryForm();
+ const el=document.getElementById('pendNote'); if(el)el.innerHTML='';
 }
 
 /* ── 친구와 나누기 ────────────────────────────────────────────
@@ -956,8 +1046,8 @@ function readShared(){
 }
 const SEP='\u0000';
 function friendKey(c){return (c.k||'')+SEP+c.u+'\u0000'+c.t}
-function getFriends(){try{return JSON.parse(localStorage.getItem(K('friends'))||'[]')}catch(e){return []}}
-function saveFriends(a){try{localStorage.setItem(K('friends'),JSON.stringify(a.slice(-CARD_MAX)))}catch(e){}}
+function getFriends(){return readJSON(K('friends'),[])}
+function saveFriends(a){put(K('friends'),JSON.stringify(a.slice(-CARD_MAX)))}
 function keepShared(){
  if(!incomingCard)return;
  const a=getFriends().filter(x=>friendKey(x)!==friendKey(incomingCard));
@@ -995,6 +1085,13 @@ function renderFriends(){
 /* 앱을 켜 둔 채로 카드 링크를 누르면 주소의 # 뒤만 바뀐다. 페이지가 다시
    뜨지 않으므로 아무 일도 안 일어난다. 그 변화를 직접 듣고 있는다. */
 window.addEventListener('hashchange',()=>{readShared()});
+/* 쓰는 도중에 앱이 꺼지거나 단축어로 넘어가도 잃지 않게 계속 적어 둔다 */
+let pendTimer=null;
+['bookTitle','bookRange','bookQuote','bookThought'].forEach(id=>{
+ const el=document.getElementById(id); if(!el)return;
+ el.addEventListener('input',()=>{clearTimeout(pendTimer);pendTimer=setTimeout(savePending,600)});
+});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)savePending()});
 initStorage();
 </script>
 
