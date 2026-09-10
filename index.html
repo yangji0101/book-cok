@@ -569,6 +569,7 @@ table.prep td:first-child{width:34%;white-space:nowrap;color:var(--brand-d);font
  <button class="pickrow" onclick="show('nfcsetup',null)">🔕 <b>NFC 태그 설정</b><small>태그를 대면 바로 독서가 시작되게 합니다</small></button>
  <button class="pickrow" onclick="openAdmin()">🔧 <b>관리자</b><small>만든 사람들이 쓰는 화면입니다</small></button>
 </div>
+<p class="label" id="verNote" style="margin-top:14px"></p>
 </section>
 
 <section id="admin" class="page">
@@ -1049,7 +1050,9 @@ function show(id,btn){
  document.querySelectorAll('.mobile-nav button').forEach(x=>
   x.classList.toggle('on',x.dataset.page===id));
  if(id==='more'){const el=document.getElementById('moreWho');
-  if(el)el.textContent=(CLASS||'반 없음')+' · '+GUEST}
+  if(el)el.textContent=(CLASS||'반 없음')+' · '+GUEST;
+  const v=document.getElementById('verNote');
+  if(v)v.textContent='BOOK-COK 앱 판 '+APP_VER}
  window.scrollTo(0,0);
 }
 function fmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
@@ -2048,6 +2051,8 @@ function startNewProfile(){put('bookcok_skiplogin','1');renderSignup();show('sig
    서버가 없으니 '계정' 이 아니다. 이 기기에서 앱을 손보는 도구다.
    암호는 이 파일 안에 그대로 적혀 있어서 비밀이 될 수 없다.
    잠금장치가 아니라 팻말이다 — 지켜야 할 것은 여기 넣지 않는다. */
+/* 배포가 됐는지 눈으로 확인하려고 둔다. 고칠 때마다 날짜를 올린다. */
+const APP_VER='2026-09-10 · 친구 링크 수정';
 const ADMIN_CODE='bookcok-2026';
 const ADMIN_SEED=['만든 사람 1','만든 사람 2'];
 function getAdmins(){const a=readJSON('bookcok_admins',null);return Array.isArray(a)&&a.length?a:ADMIN_SEED}
@@ -2100,7 +2105,8 @@ function renderAdmin(){
   +'<b>내 기록</b><span>'+getRecordsSync().length+'개</span>'
   +'<b>담아 둔 카드</b><span>'+getFriends().length+'장</span>'
   +'<b>저장 칸 이름</b><span><code>'+esc(K('records'))+'</code></span>'
-  +'<b>앱 주소</b><span>'+esc(appURL())+'</span>';
+  +'<b>앱 주소</b><span>'+esc(appURL())+'</span>'
+  +'<b>앱 판</b><span>'+esc(APP_VER)+'</span>';
 }
 function loadSchoolBox(){
  const el=document.getElementById('schoolBox'); if(el)el.value=getSchools().join('\n');
