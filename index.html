@@ -839,9 +839,9 @@ function showStorageWarning(e){
 function newGuestId(){return Math.random().toString(36).slice(2,8)}
 function guestId(){
  const q=new URLSearchParams(location.search).get('u');
- if(q){try{localStorage.setItem('bookcok_guest',q)}catch(e){}return q}
- let id=null;try{id=localStorage.getItem('bookcok_guest')}catch(e){}
- if(!id){id=newGuestId();try{localStorage.setItem('bookcok_guest',id)}catch(e){}}
+ if(q){put('bookcok_guest',q);return q}
+ let id=get('bookcok_guest','');
+ if(!id){id=newGuestId();put('bookcok_guest',id)}
  return id;
 }
 const GUEST=guestId();
@@ -974,7 +974,7 @@ function doSignup(){
 }
 function switchClass(){renderSignup();show('signup',null)}
 /* 반에 처음 들어왔는데 반 없이 쌓아 둔 기록이 있으면 가져올 수 있게 한다 */
-function oldRecords(){try{return JSON.parse(localStorage.getItem(K0('records'))||'[]')}catch(e){return []}}
+function oldRecords(){return readJSON(K0('records'),[])}
 function canImportOld(){
  if(!CLASS) return false;
  if(getRecordsSync().length||getBooks().length) return false;
@@ -984,8 +984,8 @@ function importOld(){
  const n=oldRecords().length;
  if(!confirm('반이 없던 때 쌓은 기록 '+n+'개를 «'+CLASS+'» 로 가져올까요?\n원래 있던 칸의 기록도 그대로 남습니다.'))return;
  ['records','books','completed'].forEach(k=>{
-  const v=localStorage.getItem(K0(k));
-  if(v!==null){try{localStorage.setItem(K(k),v)}catch(e){}}
+  const v=get(K0(k),null);
+  if(v!==null) put(K(k),v);
  });
  renderLibraryFallback();
  alert('가져왔습니다. 기록 '+n+'개 📚');
@@ -994,7 +994,7 @@ function switchGuest(){
  const name=prompt('이름이나 별명을 넣으면 그 이름으로 기록이 따로 쌓입니다.\n비워 두고 확인을 누르면 새 손님으로 시작합니다.','');
  if(name===null)return;
  const id=name.trim()||newGuestId();
- try{localStorage.setItem('bookcok_guest',id)}catch(e){}
+ put('bookcok_guest',id);
  location.href=location.pathname+'?'+classQ()+'u='+encodeURIComponent(id);
 }
 
@@ -1240,8 +1240,8 @@ async function saveRecord(){
  }catch(e){console.error(e);alert('기록 저장에 실패했습니다.');}
 }
 function toggleComplete(name){
- const c=JSON.parse(localStorage.getItem(K('completed'))||'{}');c[name]=!c[name];if(!c[name])delete c[name];
- localStorage.setItem(K('completed'),JSON.stringify(c));renderLibraryFallback();
+ const c=readJSON(K('completed'),{});c[name]=!c[name];if(!c[name])delete c[name];
+ put(K('completed'),JSON.stringify(c));renderLibraryFallback();
 }
 function renderMonthly(records){
  const now=new Date(),months=[];
@@ -1272,7 +1272,7 @@ const SPLIT_AT=6;                       /* 갈림길에 서는 기록 수 */
 const COMMON=[
  {at:0, img:'seed',   face:'🌰', name:'씨앗',  말:'아직 심기 전이에요'},
  {at:1, img:'sprout', face:'🌱', name:'새싹',  말:'첫 기록이 싹을 틔웠어요'},
- {at:3, img:'leaf',   face:'🌿', name:'떡잎',  말:'잎이 두 장 났어요'}
+ {at:3, img:'leaf',   face:'🌿', name:'떡잎',  말:'잎 사이에서 누가 나올까요?'}
 ];
 const PATHS={
  sol:{name:'솔이', face:'🦔', 소개:'돋보기를 든 고슴도치 · 파고드는 탐정',
@@ -1380,7 +1380,7 @@ function renderGrowth(records){
  /* 갈림길 — 솔이와 국이 중 하나 */
  const 고르는곳=document.getElementById('pathPick');
  if(고르는곳) 고르는곳.innerHTML=갈림길
-  ? '<div class="classnote"><b>🌱 어떤 친구로 자랄까요?</b><br>한 번 고르면 그 친구로 계속 자랍니다. 나중에 바꿀 수도 있어요.</div>'
+  ? '<div class="classnote"><b>🌱 떡잎 사이에서 친구가 나왔어요!</b><br>씨앗이 자라 이제 함께 읽을 친구가 됩니다. 한 번 고르면 그 친구로 계속 자라고, 나중에 바꿀 수도 있어요.</div>'
     +'<div class="pathpick">'+Object.keys(PATHS).map(k=>
       '<button class="pathbtn" onclick="setPath(\''+k+'\')">'
       +'<span class="pf">'+PATHS[k].face+'</span><b>'+esc(PATHS[k].name)+'</b>'
@@ -1444,7 +1444,7 @@ function addSampleRecord(){
  arr.push({bookTitle:책,range:'',quote:'',thought:'테스트로 넣은 기록',
   duration:600+Math.floor(Math.random()*1800),noise:'없음',
   createdAt:new Date().toISOString(),id:Date.now()+Math.random()});
- try{localStorage.setItem(K('records'),JSON.stringify(arr))}catch(e){}
+ put(K('records'),JSON.stringify(arr));
  renderLibraryFallback();
 }
 function getRecordsSync(){return readJSON(K('records'),[])}
@@ -1562,7 +1562,7 @@ async function renderLibraryFallback(){
     +oldRecords().length+'개가 남아 있어요.<br><button class="secondary" onclick="importOld()">예전 기록을 이 반으로 가져오기</button></div>'
   : '';
  const grouped={};records.forEach(r=>(grouped[r.bookTitle]??=[]).push(r));
- const completed=JSON.parse(localStorage.getItem(K('completed'))||'{}');
+ const completed=readJSON(K('completed'),{});
  const names=[...new Set([...Object.keys(grouped),...getBooks()])];
  if(!names.length){box.innerHTML='<div class="empty">아직 저장된 독서 기록이 없습니다.<br>첫 독서를 시작해보세요 📖</div>';return}
  box.innerHTML=names.map(name=>{
@@ -1760,7 +1760,7 @@ function cleanCard(c){
 /* 내 기록에서 책 한 권을 카드로 만든다 */
 function buildCard(name){
  const rs=getRecordsSync().filter(r=>r.bookTitle===name);
- const completed=JSON.parse(localStorage.getItem(K('completed'))||'{}');
+ const completed=readJSON(K('completed'),{});
  const 최근=[...rs].sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt)));
  const 문장=(최근.find(r=>r.quote)||{}).quote||'';
  const 생각=(최근.find(r=>r.thought)||{}).thought||'';
