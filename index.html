@@ -332,30 +332,15 @@ table.prep{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px}
 table.prep td{border-top:1px solid var(--line);padding:9px 4px;vertical-align:top;line-height:1.6}
 table.prep td:first-child{width:34%;white-space:nowrap;color:var(--brand-d);font-weight:700}
 
-/* ── 마스코트 ───────────────────────────────────────────────── */
-.mascots{display:flex;align-items:end;gap:8px;margin-left:auto}
-.mascot{width:95px;height:110px;position:relative;filter:drop-shadow(0 7px 7px rgba(40,60,45,.12))}
-.mascot .body{position:absolute;bottom:5px;left:12px;width:70px;height:64px;
- border-radius:48%;background:#d9c39b;border:3px solid #9d8358}
-.mascot .face{position:absolute;bottom:24px;left:25px;width:55px;height:47px;
- background:#f5e4c4;border-radius:50%;border:2px solid #b99a6c}
-.mascot .eye{position:absolute;width:6px;height:6px;background:#263128;border-radius:50%;top:19px}
-.mascot .e1{left:12px}.mascot .e2{right:12px}
-.mascot .nose{position:absolute;width:7px;height:7px;border-radius:50%;background:#4d4033;right:2px;top:24px}
-.sol .quill{position:absolute;top:3px;left:4px;width:91px;height:45px;
- background:repeating-linear-gradient(115deg,#547657 0 5px,transparent 5px 11px);
- border-radius:50%;transform:rotate(-8deg)}
-.mascot .label{position:absolute;bottom:-12px;left:0;right:0;text-align:center;
- font-size:12px;font-weight:900;color:#4b654f}
-.kuk .body{background:#ead9a7;border-color:#b49a5f}
-.kuk .face{background:#f7ebc9;border-color:#c2aa71}
-.kuk .petal{position:absolute;width:21px;height:38px;background:#e9c85b;border-radius:50%;
- top:-1px;left:37px;box-shadow:0 0 0 2px #c9a53f}
-.kuk .petal:before,.kuk .petal:after{content:"";position:absolute;width:21px;height:38px;
- background:#efd77b;border-radius:50%;top:5px}
-.kuk .petal:before{left:-17px;transform:rotate(-50deg)}
-.kuk .petal:after{left:17px;transform:rotate(50deg)}
-.kuk .center{position:absolute;top:13px;left:45px;width:10px;height:10px;border-radius:50%;background:#9a7335}
+/* ── 홈의 두 친구 ──────────────────────────────────────────── */
+.mascots{display:flex;align-items:end;gap:16px;margin-left:auto}
+.hm{display:flex;flex-direction:column;align-items:center;gap:4px;
+ transition:opacity .2s,transform .2s}
+.hm.dim{opacity:.38;transform:scale(.9)}
+.hm img{width:88px;height:88px;object-fit:contain;
+ filter:drop-shadow(0 7px 7px rgba(40,60,45,.14))}
+.hmface{font-size:56px;line-height:1;filter:drop-shadow(0 6px 6px rgba(40,60,45,.13))}
+.hm b{font-size:12px;font-weight:900;color:#4b654f}
 
 /* ── 좁은 화면 ──────────────────────────────────────────────── */
 .mobile-nav{display:none}
@@ -427,9 +412,7 @@ table.prep td:first-child{width:34%;white-space:nowrap;color:var(--brand-d);font
 <div id="storageWarn"></div>
 
 <section id="home" class="page active">
-<div class="hero"><div><h2>📖 독서를 시작해볼까요?</h2><p>NFC 책갈피를 태그하면 몰입 환경과 백색소음이 준비됩니다.</p></div><div class="mascots">
-<div class="mascot sol"><div class="quill"></div><div class="body"></div><div class="face"><i class="eye e1"></i><i class="eye e2"></i><i class="nose"></i></div><div class="label">솔이 🌲</div></div>
-<div class="mascot kuk"><div class="petal"></div><div class="center"></div><div class="body"></div><div class="face"><i class="eye e1"></i><i class="eye e2"></i><i class="nose"></i></div><div class="label">국이 🌼</div></div></div><button class="primary" onclick="startReading()">NFC 태그하고 독서 시작</button></div>
+<div class="hero"><div><h2>📖 독서를 시작해볼까요?</h2><p>NFC 책갈피를 태그하면 몰입 환경과 백색소음이 준비됩니다.</p></div><div class="mascots" id="heroMascots"></div><button class="primary" onclick="startReading()">NFC 태그하고 독서 시작</button></div>
 <div id="pendNote"></div>
 <div id="growHome" class="growbox"></div>
 <div class="cards">
@@ -1292,16 +1275,16 @@ const COMMON=[
  {at:3, img:'leaf',   face:'🌿', name:'떡잎',  말:'잎이 두 장 났어요'}
 ];
 const PATHS={
- sol:{name:'솔이', face:'🌲', 소개:'조용히 오래 자라는 나무',
-  단계:[{at:6, img:'sol-1', face:'🪴', name:'아기 솔이', 말:'화분이 좁아 보여요'},
-       {at:10,img:'sol-2', face:'🌳', name:'솔이',     말:'그늘이 생겼어요'},
-       {at:15,img:'sol-3', face:'🌲', name:'큰 솔이',  말:'새들이 놀러 와요'},
-       {at:22,img:'sol-4', face:'🎄', name:'숲이 된 솔이', 말:'솔이가 다 자랐어요'}]},
- kuk:{name:'국이', face:'🌼', 소개:'환하게 피어나는 꽃',
-  단계:[{at:6, img:'kuk-1', face:'🌱', name:'아기 국이', 말:'꽃봉오리가 맺혔어요'},
-       {at:10,img:'kuk-2', face:'🌻', name:'국이',     말:'꽃잎이 열렸어요'},
-       {at:15,img:'kuk-3', face:'🌼', name:'활짝 국이', 말:'향기가 퍼져요'},
-       {at:22,img:'kuk-4', face:'💐', name:'꽃밭이 된 국이', 말:'국이가 다 자랐어요'}]}
+ sol:{name:'솔이', face:'🦔', 소개:'돋보기를 든 고슴도치 · 파고드는 탐정',
+  단계:[{at:6, img:'sol-1', face:'🌰', name:'아기 솔이', 말:'가시가 뾰족 올라왔어요'},
+       {at:10,img:'sol-2', face:'🦔', name:'솔이',       말:'교복을 입고 학교에 갔어요'},
+       {at:15,img:'sol-3', face:'🤓', name:'안경 쓴 솔이', 말:'돋보기로 문장을 파고들어요'},
+       {at:22,img:'sol-4', face:'🔍', name:'박사 솔이',   말:'솔이가 다 자랐어요'}]},
+ kkul:{name:'꿀이', face:'🐷', 소개:'꽃을 단 돼지 · 이야기를 좋아하는 친구',
+  단계:[{at:6, img:'kkul-1', face:'🌱', name:'아기 꿀이', 말:'머리에 꽃이 폈어요'},
+       {at:10,img:'kkul-2', face:'🐷', name:'꿀이',       말:'교복을 입고 학교에 갔어요'},
+       {at:15,img:'kkul-3', face:'📗', name:'책 읽는 꿀이', 말:'초록 책을 끼고 다녀요'},
+       {at:22,img:'kkul-4', face:'💐', name:'이야기꾼 꿀이', 말:'꿀이가 다 자랐어요'}]}
 };
 /* 옷 — 조건을 채우면 옷장에 열린다 */
 const WEARS=[
@@ -1311,7 +1294,11 @@ const WEARS=[
  {id:'ribbon', face:'🎀', name:'리본',   조건:{완독:3},  말:'완독 3권'},
  {id:'crown',  face:'👑', name:'왕관',   조건:{기록:22}, 말:'기록 22개'}
 ];
-function getPath(){const v=get(K('path'),'');return PATHS[v]?v:''}
+function getPath(){
+ let v=get(K('path'),'');
+ if(v==='kuk')v='kkul';                 /* 예전 이름을 새 이름으로 이어 준다 */
+ return PATHS[v]?v:'';
+}
 function setPath(v){if(!PATHS[v])return;put(K('path'),v);renderLibraryFallback();show('growth',null)}
 function getWear(){const v=get(K('wear'),'');return WEARS.some(w=>w.id===v)?v:''}
 function doneCount(){const c=readJSON(K('completed'),{});return Object.keys(c).length}
@@ -1359,7 +1346,22 @@ function mascotHTML(stage,big){
   +(w&&path?'<img class="mwear" alt="" src="mascot/wear-'+w.id+'.png">':'')
   +'</div>';
 }
+function renderHeroMascots(){
+ const box=document.getElementById('heroMascots'); if(!box)return;
+ const path=getPath();
+ const 그림=(k)=>{
+  const P=PATHS[k], 마지막=P.단계[P.단계.length-1];
+  const 흐림=(path&&path!==k)?' dim':'';
+  return '<div class="hm'+흐림+'">'
+   +(mascotOk===true
+     ? '<img src="mascot/'+마지막.img+'.png" alt="'+esc(P.name)+'">'
+     : '<span class="hmface">'+P.face+'</span>')
+   +'<b>'+esc(P.name)+'</b></div>';
+ };
+ box.innerHTML=Object.keys(PATHS).map(그림).join('');
+}
 function renderGrowth(records){
+ renderHeroMascots();
  const n=records.length, g=growthOf(n), path=getPath();
  const 갈림길=!path && n>=SPLIT_AT;
  const 남은=g.다음?g.다음.at-n:0;
