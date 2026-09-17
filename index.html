@@ -398,6 +398,40 @@ table.prep td:first-child{width:34%;white-space:nowrap;color:var(--brand-d);font
 .rkval span{display:block;font-size:11.5px;color:var(--ink3);margin-top:1px}
 .rkdrop{flex:none;border:0;background:var(--tint);color:var(--ink3);border-radius:9px;
  width:26px;height:26px;font-size:14px;line-height:1;cursor:pointer;padding:0}
+
+/* ── 🏫 학교 대항전 ─────────────────────────────────────────── */
+.sideschool{margin-top:18px;padding:14px 12px 12px;background:var(--brand-l);
+ border:1px solid var(--brand-b);border-radius:var(--r-md)}
+.sideschool h3{margin:0 0 3px;font-size:13px;font-weight:850;color:var(--brand-d)}
+.sideschool .label{font-size:11px;margin-bottom:9px}
+.schoolrow{display:flex;align-items:center;gap:8px;padding:7px 0;
+ border-top:1px solid var(--brand-b)}
+.schoolrow:first-of-type{border-top:0}
+.schoolrow .sk{flex:none;width:19px;font-size:12px;font-weight:900;color:var(--ink3);text-align:center}
+.schoolrow .sbody{flex:1;min-width:0}
+.schoolrow .sname{font-size:12.5px;font-weight:800;white-space:nowrap;
+ overflow:hidden;text-overflow:ellipsis}
+.schoolrow .sarea{font-size:10.5px;font-weight:700;color:var(--ink3)}
+.schoolrow .sbar{height:6px;background:var(--tint2);border-radius:999px;overflow:hidden;margin-top:4px}
+.schoolrow .sbar i{display:block;height:100%;border-radius:999px;min-width:3px;background:var(--grad)}
+.schoolrow .sval{flex:none;font-size:11.5px;font-weight:900;color:var(--brand-d);
+ font-variant-numeric:tabular-nums}
+.schoolrow.mine .sname{color:var(--brand-d)}
+.schoolrow .mychip{display:inline-block;font-size:9.5px;font-weight:800;color:#fff;
+ background:var(--brand);border-radius:999px;padding:2px 6px;margin-left:5px;vertical-align:1px}
+.schoolboard{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-lg);
+ padding:16px 18px;box-shadow:var(--shadow)}
+.schoolboard .schoolrow{border-top-color:var(--line)}
+.schoolboard .sname{font-size:14.5px}
+.schoolboard .sval{font-size:14px}
+
+/* ── 기록 글자 수 ───────────────────────────────────────────── */
+.charnote{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12.5px;
+ font-weight:800;color:var(--warn)}
+.charnote.ok{color:var(--brand-d)}
+.charnote .cbar{flex:1;height:6px;background:var(--tint2);border-radius:999px;overflow:hidden}
+.charnote .cbar i{display:block;height:100%;border-radius:999px;background:var(--grad);
+ min-width:2px;transition:width .2s}
 .rkdrop:hover{background:var(--bad-bg);color:var(--bad)}
 
 /* ── 홈의 두 친구 ──────────────────────────────────────────── */
@@ -483,6 +517,7 @@ table.prep td:first-child{width:34%;white-space:nowrap;color:var(--brand-d);font
 <button class="sidebtn" data-page="growth" onclick="show('growth',this)">🌱 나의 성장</button>
 <button class="sidebtn" data-page="nfcsetup" onclick="show('nfcsetup',this)">🔕 NFC 설정</button>
 <button class="sidebtn" data-page="admin" onclick="openAdmin()">🔧 관리자</button>
+<div class="sideschool" id="sideSchools"></div>
 </aside>
 
 <main class="content">
@@ -537,8 +572,9 @@ table.prep td:first-child{width:34%;white-space:nowrap;color:var(--brand-d);font
 <div id="dndOff"></div>
 <label>책 제목</label><input id="bookTitle" class="input" placeholder="예: 데미안">
 <label>읽은 범위</label><input id="bookRange" class="input" placeholder="예: 32p ~ 57p">
-<label>오늘의 한 문장</label><input id="bookQuote" class="input" placeholder="기억에 남은 문장이나 생각">
-<label>내 생각</label><textarea id="bookThought" class="input textarea" placeholder="왜 인상 깊었는지 자유롭게 적어보세요."></textarea>
+<label>오늘의 한 문장</label><input id="bookQuote" class="input" placeholder="기억에 남은 문장이나 생각" oninput="charCount()">
+<label>내 생각</label><textarea id="bookThought" class="input textarea" placeholder="왜 인상 깊었는지 자유롭게 적어보세요. 문장과 생각을 합쳐 50자 이상 써야 기록으로 저장됩니다." oninput="charCount()"></textarea>
+<div class="charnote" id="charNote"></div>
 <button class="primary" style="width:100%;margin-top:8px" onclick="saveRecord()">보관함에 기록 저장</button>
 </div></section>
 
@@ -561,7 +597,14 @@ table.prep td:first-child{width:34%;white-space:nowrap;color:var(--brand-d);font
  <h2 id="signHead">학교를 찾아 주세요</h2>
  <p class="label" id="signSub">한 번만 하면 됩니다.</p>
 
- <div class="signstep" id="step-school">
+ <div class="signstep" id="step-region">
+  <div id="regionList" class="pickgrid"></div>
+  <label class="label" for="areaInput" style="margin-top:12px;display:block">시 · 군 · 구 (안 넣어도 됩니다)</label>
+  <input id="areaInput" class="input" placeholder="예: 강남구" maxlength="20" autocomplete="off" oninput="pickArea(this.value)">
+  <p class="label">같은 이름의 학교가 여러 지역에 있어서 지역까지 받습니다.</p>
+ </div>
+
+ <div class="signstep" id="step-school" hidden>
   <input id="schoolSearch" class="input" placeholder="학교 이름 검색 · 예: 세종고" autocomplete="off" oninput="searchSchool(this.value)">
   <div id="schoolList" class="picklist"></div>
  </div>
@@ -592,6 +635,11 @@ table.prep td:first-child{width:34%;white-space:nowrap;color:var(--brand-d);font
 <section id="rank" class="page">
 <p class="label">오래 읽은 순서입니다. 친구가 보낸 <b>기록 카드</b>를 담으면 함께 순위에 섭니다.</p>
 <div id="rankSummary"></div>
+<div class="section" id="schoolBoardWrap"><h2>🏫 학교 대항전</h2>
+ <p class="label">담아 둔 친구 카드를 학교끼리 묶어서 줄을 세웁니다. 같은 이름의 학교는 지역으로 구분합니다.</p>
+ <div class="schoolboard" id="schoolBoard"></div>
+</div>
+<div class="section"><h2>🏆 사람 순위</h2></div>
 <div id="rankList" class="ranklist"></div>
 <div id="rankEmpty"></div>
 <div class="adminrow" style="margin-top:14px">
@@ -971,6 +1019,9 @@ function showStorageWarning(e){
    처음 들어오면 손님 번호를 하나 만들어 이 브라우저에 적어 둔다.
    주소 뒤에 ?u=이름 을 붙이면 그 이름으로 따로 쌓인다.          */
 function newGuestId(){return Math.random().toString(36).slice(2,8)}
+/* 브라우저가 이름표만 지워 로그인이 풀린 것처럼 보이면 되살린다.
+   아래 «등록했나» 를 읽기 전에 해야 이번 실행에 바로 반영된다. */
+restoreSignIn();
 /* ── 주소에 실려 온 이름·반 ───────────────────────────────────
    링크를 받아서 들어오면 주소에 «누구» 가 들어 있을 수 있다.
    그걸 그대로 받아들이면, 친구가 보낸 링크로 들어간 사람이
@@ -1029,11 +1080,40 @@ function getSchools(){const a=readJSON('bookcok_schools',null);return Array.isAr
 function saveSchools(a){return put('bookcok_schools',JSON.stringify(a))}
 function gradesOf(school){return /초등/.test(school||'')?6:3}
 
-const STEP_IDS=['school','grade','room','name'];
-const STEP_NAMES=['학교','학년','반','이름'];
-const STEP_HEADS=['학교를 찾아 주세요','몇 학년인가요?','몇 반인가요?','이름을 넣어 주세요'];
+/* ── 지역 ─────────────────────────────────────────────────────
+   «세종고등학교» 는 전국에 여럿 있다. 이름만으로는 우리 학교인지
+   알 수 없어서 지역을 같이 받는다.
+
+   중요: 지역은 저장 칸 이름(K)에 넣지 않는다. 넣으면 이미 쌓아 둔
+   기록의 칸 이름이 바뀌어 전부 «사라진 것처럼» 보인다. 지역은
+   학교를 구분하는 이름표로만 쓰고, 칸 이름은 예전 그대로 둔다.     */
+const REGIONS=['서울','부산','대구','인천','광주','대전','울산','세종',
+ '경기','강원','충북','충남','전북','전남','경북','경남','제주'];
+function myRegion(){return get('bookcok_region','')}
+function myArea(){return get('bookcok_area','')}
+/* 화면에 보여 줄 지역 한 줄. 예: '서울 강남구' */
+function regionText(r,a){
+ r=(r===undefined?myRegion():r); a=(a===undefined?myArea():a);
+ return [String(r||'').trim(),String(a||'').trim()].filter(Boolean).join(' ').slice(0,30);
+}
+/* 학교 이름 한 줄 — 지역이 있으면 괄호로 붙인다 */
+function schoolLabel(school,region){
+ const s=String(school||'').trim(); if(!s)return '';
+ const r=String(region===undefined?regionText():region||'').trim();
+ return r? s+' ('+r+')' : s;
+}
+/* 반 이름표에서 학교 이름만 떼어 낸다. '세종고 3-2' → '세종고' */
+function schoolOfScope(scope){
+ return String(scope||'').replace(/\s*\d+-\d+\s*$/,'').trim();
+}
+function myScopeSchool(){return get('bookcok_school','')||schoolOfScope(CLASS)}
+
+const STEP_IDS=['region','school','grade','room','name'];
+const STEP_NAMES=['지역','학교','학년','반','이름'];
+const STEP_HEADS=['어느 지역인가요?','학교를 찾아 주세요','몇 학년인가요?','몇 반인가요?','이름을 넣어 주세요'];
+const LAST_STEP=STEP_IDS.length-1;
 let signStep=0;
-let pick={school:'',grade:0,room:0};
+let pick={region:'',area:'',school:'',grade:0,room:0};
 
 function isSigned(){return get('bookcok_signed','')==='1'}
 function needSignup(){
@@ -1060,53 +1140,66 @@ function searchSchool(q){
  if(!html) html='<div class="empty">학교 이름을 입력하면 그대로 쓸 수 있어요.<br>선생님이 학교 목록을 넣어 두면 눌러서 고릅니다.</div>';
  box.innerHTML=html;
 }
+function renderRegions(){
+ const box=document.getElementById('regionList'); if(!box)return;
+ box.innerHTML=REGIONS.map(r=>'<button class="pickcell'+(pick.region===r?' on':'')
+  +'" onclick="pickRegion(\''+jsq(r)+'\')">'+esc(r)+'</button>').join('');
+ const el=document.getElementById('areaInput'); if(el)el.value=pick.area||'';
+}
+function pickRegion(r){pick.region=r;renderRegions();signGo(1)}
+function pickArea(v){pick.area=String(v||'').trim().slice(0,20)}
 function pickSchool(name){pick.school=name;pick.grade=0;pick.room=0;
  const el=document.getElementById('schoolSearch'); if(el)el.value=name;
- searchSchool(name); signGo(1);}
+ searchSchool(name); signGo(2);}
 function renderGrades(){
  const box=document.getElementById('gradeList'); if(!box)return;
  const n=gradesOf(pick.school); let h='';
  for(let i=1;i<=n;i++) h+='<button class="pickcell'+(pick.grade===i?' on':'')+'" onclick="pickGrade('+i+')">'+i+'학년</button>';
  box.innerHTML=h;
 }
-function pickGrade(n){pick.grade=n;pick.room=0;renderGrades();signGo(2)}
+function pickGrade(n){pick.grade=n;pick.room=0;renderGrades();signGo(3)}
 function renderRooms(){
  const box=document.getElementById('roomList'); if(!box)return;
  let h='';
  for(let i=1;i<=ROOM_MAX;i++) h+='<button class="pickcell'+(pick.room===i?' on':'')+'" onclick="pickRoom('+i+')">'+i+'반</button>';
  box.innerHTML=h;
 }
-function pickRoom(n){pick.room=n;renderRooms();signGo(3)}
+function pickRoom(n){pick.room=n;renderRooms();signGo(4)}
 function signSkip(){
- if(signStep===0)pick.school='';
- if(signStep===1)pick.grade=0;
- if(signStep===2)pick.room=0;
+ if(signStep===0){pick.region='';pick.area=''}
+ if(signStep===1)pick.school='';
+ if(signStep===2)pick.grade=0;
+ if(signStep===3)pick.room=0;
  signGo(signStep+1);
 }
 function signGo(i){
- signStep=Math.max(0,Math.min(3,i));
+ signStep=Math.max(0,Math.min(LAST_STEP,i));
  STEP_IDS.forEach((id,k)=>{const el=document.getElementById('step-'+id);if(el)el.hidden=(k!==signStep)});
  document.getElementById('signHead').textContent=STEP_HEADS[signStep];
  document.getElementById('signBack').hidden=(signStep===0);
- document.getElementById('signNext').textContent=(signStep===3)?'시작하기':'건너뛰기';
- document.getElementById('signNext').className=(signStep===3)?'primary':'secondary';
+ document.getElementById('signNext').textContent=(signStep===LAST_STEP)?'시작하기':'건너뛰기';
+ document.getElementById('signNext').className=(signStep===LAST_STEP)?'primary':'secondary';
  document.getElementById('signMsg').textContent='';
- if(signStep===1)renderGrades();
- if(signStep===2)renderRooms();
- if(signStep===3){
+ if(signStep===0)renderRegions();
+ if(signStep===2)renderGrades();
+ if(signStep===3)renderRooms();
+ if(signStep===LAST_STEP){
   const 반=(pick.grade&&pick.room)?pick.grade+'학년 '+pick.room+'반':'';
+  const 지역=regionText(pick.region,pick.area);
   document.getElementById('pickedBox').innerHTML=
    '<b>'+esc(pick.school||'학교 없음')+'</b>'+(반?' · '+esc(반):'')
+   +(지역?'<small style="display:block;color:var(--ink3);font-weight:700">📍 '+esc(지역)+'</small>':'')
    +'<button class="linkbtn" onclick="signGo(0)">바꾸기</button>';
  }
  const bar=document.getElementById('signSteps');
  if(bar) bar.innerHTML=STEP_NAMES.map((n,k)=>
   '<span class="s4'+(k===signStep?' now':'')+(k<signStep?' done':'')+'">'+(k+1)+'. '+n+'</span>').join('');
 }
-function signNext(){ signStep===3 ? doSignup() : signSkip() }
+function signNext(){ signStep===LAST_STEP ? doSignup() : signSkip() }
 function signPrev(){ signGo(signStep-1) }
 function renderSignup(){
- pick={school:get('bookcok_school',''),grade:+get('bookcok_grade',0)||0,room:+get('bookcok_room',0)||0};
+ pick={region:myRegion(),area:myArea(),
+  school:get('bookcok_school',''),grade:+get('bookcok_grade',0)||0,room:+get('bookcok_room',0)||0};
  /* 링크가 반을 들고 왔으면 채워만 준다. 이름은 본인이 넣어야 한다. */
  if(!isSigned() && urlC){
   const m=/^(.*?)\s*(\d+)-(\d+)$/.exec(urlC);
@@ -1115,6 +1208,7 @@ function renderSignup(){
  }
  const el=document.getElementById('schoolSearch'); if(el)el.value=pick.school;
  const nm=document.getElementById('signName'); if(nm)nm.value=isSigned()?GUEST:'';
+ renderRegions();
  searchSchool(pick.school);
  const 반이정해짐=!isSigned() && urlC && pick.school && pick.grade && pick.room;
  document.getElementById('signSub').textContent=isSigned()
@@ -1123,7 +1217,7 @@ function renderSignup(){
    ? '반은 링크에 들어 있었어요. 이름만 넣으면 됩니다.'
    : '학교와 반을 고르면 반 친구들과 따로 기록이 쌓입니다. 한 번만 하면 됩니다.';
  /* 반까지 정해진 링크로 왔으면 이름만 물어본다 */
- signGo(반이정해짐?3:0);
+ signGo(반이정해짐?LAST_STEP:0);
 }
 function doSignup(){
  const name=(document.getElementById('signName').value||'').trim().slice(0,20);
@@ -1132,6 +1226,8 @@ function doSignup(){
  const scope=scopeOf();
  put('bookcok_class',scope);
  put('bookcok_school',pick.school);
+ put('bookcok_region',pick.region||'');
+ put('bookcok_area',pick.area||'');
  put('bookcok_grade',String(pick.grade||''));
  put('bookcok_room',String(pick.room||''));
  put('bookcok_guest',name);
@@ -1170,6 +1266,34 @@ function switchGuest(){
  location.href=location.pathname;
 }
 
+/* ── 로그인 유지 ──────────────────────────────────────────────
+   «한 번 로그인하면 계속» 이 기본이다. 앱을 열 때 다시 묻는 것은
+   ⚙️ 더보기 ▸ 공용 기기 모드를 켰을 때뿐이다 (교실 태블릿용).
+
+   그래도 «로그인이 풀렸다» 는 말이 나오는 진짜 이유는 브라우저가
+   저장칸을 비웠기 때문이다. 이름표(bookcok_guest·signed)만 날아가고
+   등록된 사람 목록(bookcok_profiles)이 남아 있는 경우가 흔해서,
+   그럴 때는 묻지 않고 마지막에 쓰던 사람으로 되살린다.
+
+   쿠키에는 적지 않는다. 쿠키는 페이지를 열 때마다 서버로 딸려 가서
+   학생 이름이 남의 서버 기록에 남는다. 이 앱은 그런 걸 만들지 않는다.
+   기기를 아예 바꿀 때는 관리자 화면의 «백업 글자» 를 쓴다.          */
+function restoreSignIn(){
+ if(isSigned())return false;
+ if(askLogin())return false;            /* 공용 기기면 물어보는 게 맞다 */
+ const 사람=getProfiles().slice().sort((a,b)=>(b.at||0)-(a.at||0))[0];
+ if(!사람||사람.pin)return false;        /* 잠금번호가 걸려 있으면 물어본다 */
+ put('bookcok_guest',사람.name);
+ put('bookcok_class',사람.scope||'');
+ put('bookcok_school',사람.school||'');
+ put('bookcok_grade',사람.grade||'');
+ put('bookcok_room',사람.room||'');
+ put('bookcok_region',사람.region||'');
+ put('bookcok_area',사람.area||'');
+ put('bookcok_signed','1');
+ return true;
+}
+
 let timerSec=0,running=false,timerId=null,currentNoise=null;
 function show(id,btn){
  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
@@ -1177,13 +1301,15 @@ function show(id,btn){
  const titles={home:'오늘도 한 페이지부터.',reading:'독서에 몰입하는 시간',record:'오늘의 독서 기록',library:'나의 독서 보관함',bookdetail:'책별 독서 포트폴리오',growth:'나의 독서 성장',rank:'우리 반 랭킹',shareme:'내 기록 보내기',gotmate:'친구의 기록 카드',signup:'등록',login:'누구인가요?',more:'더보기',admin:'관리자',friends:'친구 책장',share:'카드 보내기',shared:'친구가 보낸 카드',nfcsetup:'NFC 태그 설정'};
  document.getElementById('title').textContent=titles[id]||'BOOK-COK';
  if(id==='growth') centerStep();   /* 이제 너비를 잴 수 있다 */
+ if(id==='record') charCount();    /* 남은 글자 수를 바로 보여 준다 */
  const gb=document.querySelector('.guestbox'); if(gb)gb.hidden=(id==='signup'||id==='login');
  const nav=document.querySelector('.mobile-nav'); if(nav)nav.hidden=(id==='signup'||id==='login');
  document.querySelectorAll('.sidebtn').forEach(x=>x.classList.toggle('active',x.dataset.page===id));
  document.querySelectorAll('.mobile-nav button').forEach(x=>
   x.classList.toggle('on',x.dataset.page===id));
  if(id==='more'){const el=document.getElementById('moreWho');
-  if(el)el.textContent=(CLASS||'반 없음')+' · '+GUEST;
+  if(el)el.textContent=[(CLASS||'반 없음'),regionText(),GUEST].filter(Boolean).join(' · ');
+  renderMoreLabels();
   const v=document.getElementById('verNote');
   if(v)v.textContent='BOOK-COK 앱 판 '+APP_VER}
  window.scrollTo(0,0);
@@ -1199,6 +1325,7 @@ function clearEntryForm(){
  timerSec=0; resetNoise(); clearPending();
  const rt=document.getElementById('recordTime'); if(rt)rt.textContent='';
  const pn=document.getElementById('pendNote'); if(pn)pn.innerHTML='';
+ charCount();
 }
 function resetNoise(){
  currentNoise=null;
@@ -1385,12 +1512,40 @@ async function checkSound(){
   +'</div>';
 }
 
+/* ── 기록으로 인정되는 최소 길이 ──────────────────────────────
+   «읽었다» 만 눌러 기록만 쌓는 것을 막는다. 오늘의 한 문장과 내 생각을
+   합쳐 50자를 넘어야 저장된다. 띄어쓰기를 늘려 채우지 못하게, 이어진
+   공백은 한 칸으로 세고 앞뒤 공백은 빼고 센다.                     */
+const MIN_LOG=50;
+function logText(){
+ const q=(document.getElementById('bookQuote')||{}).value||'';
+ const t=(document.getElementById('bookThought')||{}).value||'';
+ return (q+' '+t).replace(/\s+/g,' ').trim();
+}
+function logLen(){return logText().length}
+function charCount(){
+ const el=document.getElementById('charNote'); if(!el)return;
+ const n=logLen(), 됨=n>=MIN_LOG;
+ el.className='charnote'+(됨?' ok':'');
+ el.innerHTML='<span>'+n+' / '+MIN_LOG+'자</span>'
+  +'<span class="cbar"><i style="width:'+Math.min(100,Math.round(n/MIN_LOG*100))+'%"></i></span>'
+  +'<span>'+(됨?'✅ 저장할 수 있어요':(MIN_LOG-n)+'자 더')+'</span>';
+}
 async function saveRecord(){
  const title=(document.getElementById('bookTitle').value||'제목 없음').trim();
  const range=document.getElementById('bookRange').value.trim();
  const quote=document.getElementById('bookQuote').value.trim();
  const thought=document.getElementById('bookThought').value.trim();
  if(!title){alert('책 제목을 입력해주세요.');return}
+ const 글자수=logLen();
+ if(글자수<MIN_LOG){
+  alert('기록으로 인정되려면 «오늘의 한 문장» 과 «내 생각» 을 합쳐\n'
+   +MIN_LOG+'자 이상 써야 합니다.\n\n지금 '+글자수+'자 · '+(MIN_LOG-글자수)+'자 더 필요합니다.');
+  const el=document.getElementById(quote.length<10?'bookQuote':'bookThought');
+  if(el)el.focus();
+  charCount();
+  return;
+ }
  const record={bookTitle:title,range,quote,thought,duration:timerSec,noise:currentNoise||'없음',createdAt:new Date().toISOString()};
  try{
   await addRecordSafe(record);
@@ -1642,7 +1797,11 @@ function renderStats(records){
  if(bar)bar.style.width=Math.min(100,달책.length*10)+'%';
  set('guestName',GUEST);
  const pill=document.getElementById('classPill');
- if(pill){pill.textContent='🏫 '+(CLASS||'반 없음');pill.className='classpill'+(CLASS?'':' none')}
+ if(pill){
+  const 지역=regionText();
+  pill.textContent='🏫 '+(CLASS||'반 없음')+(지역?' · '+지역:'');
+  pill.className='classpill'+(CLASS?'':' none');
+ }
  renderGrowth(records);
  /* 홈의 최근 보관함 — 마지막에 읽은 세 권 */
  const box=document.getElementById('homeBooks');
@@ -1722,6 +1881,7 @@ async function renderLibraryFallback(){
  renderFriends();
  renderRank();
  renderRankHome();
+ renderSchoolRank();
  renderRescue();
  const mig=document.getElementById('classMigrate');
  if(mig) mig.innerHTML=canImportOld()
@@ -1829,6 +1989,7 @@ function restorePending(x){
  set('bookQuote',x.quote); set('bookThought',x.thought);
  const el=document.getElementById('recordTime');
  if(el)el.textContent=timerSec?'⏱️ 이번에 읽은 시간 '+fmt(timerSec):'';
+ charCount();
 }
 
 /* byUser 가 참일 때만 단축어를 부른다. 태그로 끝난 것은 '누른 것' 이 아니다. */
@@ -2048,7 +2209,7 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden)savePending
 
    담긴 친구는 K('mates') 에 들어가고, 내 기록과는 절대 섞이지 않는다. */
 const MATE_MAX=120;
-const MATE_CUT={u:20,k:40};
+const MATE_CUT={u:20,k:40,sc:40,rg:30};
 
 function getMates(){const a=readJSON(K('mates'),[]);return Array.isArray(a)?a:[]}
 function saveMates(a){return put(K('mates'),JSON.stringify(a.slice(-MATE_MAX)))}
@@ -2058,7 +2219,8 @@ function mateKey(m){return (m.k||'')+' '+(m.u||'')}
 function buildMe(){
  const rs=getRecordsSync();
  const 분=Math.round(rs.reduce((a,r)=>a+(r.duration||0),0)/60);
- return cleanMate({u:GUEST,k:CLASS,m:분,b:new Set(rs.map(r=>r.bookTitle)).size,
+ return cleanMate({u:GUEST,k:CLASS,sc:myScopeSchool(),rg:regionText(),
+  m:분,b:new Set(rs.map(r=>r.bookTitle)).size,
   n:rs.length,s:streakDays(rs),at:new Date().toISOString().slice(0,10)});
 }
 /* 받은 것은 남이 만든 값이다. 믿지 않고 모양을 다시 맞춘다. */
@@ -2066,7 +2228,10 @@ function cleanMate(c){
  if(!c||typeof c!=='object')return null;
  const num=(v,max)=>{const x=Math.floor(Number(v));return isFinite(x)&&x>0?Math.min(x,max):0};
  const u=cut(c.u,MATE_CUT.u); if(!u)return null;
- return {v:1,u,k:cut(c.k,MATE_CUT.k),m:num(c.m,999999),b:num(c.b,9999),
+ const k=cut(c.k,MATE_CUT.k);
+ /* 학교·지역이 없는 옛날 카드는 반 이름표에서 학교만 떼어 쓴다 */
+ return {v:1,u,k,sc:cut(c.sc||schoolOfScope(k),MATE_CUT.sc),rg:cut(c.rg,MATE_CUT.rg),
+   m:num(c.m,999999),b:num(c.b,9999),
    n:num(c.n,99999),s:num(c.s,3650),at:typeof c.at==='string'?cut(c.at,30):''};
 }
 let incomingMate=null;
@@ -2087,7 +2252,7 @@ function shareMeSend(){
 }
 function mateCardHTML(m,mine){
  return '<div class="who">'+(mine?'📤 보내는 사람':'👋')+' '+esc(m.u)
-  +(m.k?' · 🏫 '+esc(m.k):'')+'</div>'
+  +(m.k?' · 🏫 '+esc(m.k):'')+(m.rg?' · 📍 '+esc(m.rg):'')+'</div>'
   +'<h3>'+hhmm(m.m)+'</h3>'
   +'<div class="meta">책 '+m.b+'권 · 기록 '+m.n+'개 · 연속 '+m.s+'일</div>'
   +(m.at?'<div class="meta">'+esc(m.at)+'</div>':'');
@@ -2111,6 +2276,47 @@ function rankRows(){
  const rows=[{...me,나:true}].concat(getMates().map(x=>({...x,나:false})));
  rows.sort((a,b)=> b.m-a.m || b.b-a.b || a.u.localeCompare(b.u));
  return rows;
+}
+/* ── 🏫 학교 대항전 ───────────────────────────────────────────
+   사람 순위와 같은 카드를 학교끼리 묶어서 다시 센다. 서버가 없으니
+   «내가 담은 카드» 만 모인다 — 전국 집계가 아니라 우리끼리의 집계다.
+
+   같은 이름의 학교가 여러 지역에 있으므로 «학교+지역» 을 한 덩어리로
+   본다. 지역을 안 넣은 사람은 따로 «지역 미상» 으로 선다.           */
+function schoolKey(sc,rg){return (sc||'')+'|'+(rg||'')}
+function schoolRows(){
+ const 내키=schoolKey(myScopeSchool(),regionText());
+ const 통=new Map();
+ rankRows().forEach(r=>{
+  const sc=r.sc||schoolOfScope(r.k)||'학교 없음';
+  const key=schoolKey(sc,r.rg);
+  const one=통.get(key)||{sc,rg:r.rg||'',m:0,b:0,n:0,사람:0,나:false};
+  one.m+=r.m; one.b+=r.b; one.n+=r.n; one.사람++;
+  if(r.나||key===내키) one.나=true;
+  통.set(key,one);
+ });
+ return [...통.values()].sort((a,b)=> b.m-a.m || b.사람-a.사람 || a.sc.localeCompare(b.sc));
+}
+function schoolRowHTML(s,i,최대){
+ return '<div class="schoolrow'+(s.나?' mine':'')+'">'
+  +'<div class="sk">'+(i<3?메달[i]:(i+1))+'</div>'
+  +'<div class="sbody"><div class="sname">'+esc(s.sc)+'</div>'
+  +'<div class="sarea">📍 '+esc(s.rg||'지역 미상')+' · '+s.사람+'명'
+   +(s.나?'<span class="mychip">우리 학교</span>':'')+'</div>'
+  +'<div class="sbar"><i style="width:'+Math.round(s.m/최대*100)+'%"></i></div></div>'
+  +'<div class="sval">'+hhmm(s.m)+'</div></div>';
+}
+/* 컴퓨터 화면은 왼쪽 차림표 아래에, 폰은 랭킹 화면 위에 같은 것을 보여 준다 */
+function renderSchoolRank(){
+ const rows=schoolRows(), 최대=Math.max(1,...rows.map(r=>r.m));
+ const 옆=document.getElementById('sideSchools');
+ if(옆) 옆.innerHTML='<h3>🏫 학교 대항전</h3>'
+  +'<div class="label">담은 카드로 학교끼리 겨룹니다</div>'
+  +rows.slice(0,5).map((s,i)=>schoolRowHTML(s,i,최대)).join('')
+  +(rows.length<2?'<div class="label" style="margin-top:8px">친구 카드를 담으면 다른 학교가 함께 섭니다.</div>':'');
+ const 판=document.getElementById('schoolBoard');
+ if(판) 판.innerHTML=rows.map((s,i)=>schoolRowHTML(s,i,최대)).join('')
+  +(rows.length<2?'<div class="empty" style="margin-top:10px">아직 우리 학교뿐이에요.<br>다른 학교 친구의 <b>기록 카드</b>를 담으면 학교끼리 줄을 섭니다 🏫</div>':'');
 }
 const 메달=['🥇','🥈','🥉'];
 /* 내 자리 카드 — 등수는 숫자로 크게, 메달은 이름 옆에. 초록 바탕 위
@@ -2137,7 +2343,7 @@ function renderRank(){
    '<div class="rankrow'+(r.나?' me':'')+'">'
    +'<div class="rk">'+(i<3?메달[i]:(i+1))+'</div>'
    +'<div class="rkbody"><div class="rkname">'+esc(r.u)+(r.나?' <em>나</em>':'')
-     +(r.k&&r.k!==CLASS?'<span class="rkclass">'+esc(r.k)+'</span>':'')+'</div>'
+     +(r.k&&r.k!==CLASS?'<span class="rkclass">'+esc(r.k)+(r.rg?' · '+esc(r.rg):'')+'</span>':'')+'</div>'
    +'<div class="rkbar"><i style="width:'+Math.round(r.m/최대*100)+'%"></i></div></div>'
    +'<div class="rkval"><b>'+hhmm(r.m)+'</b><span>책 '+r.b+'권</span></div>'
    +(r.나?'':'<button class="rkdrop" onclick="removeMate(\''+jsq(r.u)+'\',\''+jsq(r.k||'')+'\')">×</button>')
@@ -2230,6 +2436,7 @@ function rememberProfile(){
  const old=a.find(x=>x.id===id);
  const one={id,name:GUEST,scope:CLASS,
   school:get('bookcok_school',''),grade:get('bookcok_grade',''),room:get('bookcok_room',''),
+  region:myRegion(),area:myArea(),
   pin:old?old.pin:'', at:Date.now()};
  saveProfiles(a.filter(x=>x.id!==id).concat([one]));
 }
@@ -2245,7 +2452,9 @@ function renderMoreLabels(){
  const el=document.getElementById('askLoginLabel');
  if(el)el.textContent='공용 기기 모드 — '+(askLogin()?'켜짐':'꺼짐');
  const pf=document.getElementById('moreProf');
- if(pf)pf.textContent='이 기기에 등록된 사람 '+getProfiles().length+'명';
+ if(pf)pf.textContent='지금 «'+GUEST+'» 으로 로그인되어 있습니다'
+  +(askLogin()?' (공용 기기 모드라 열 때마다 묻습니다)':' · 이 기기에서는 계속 유지됩니다')
+  +' · 등록된 사람 '+getProfiles().length+'명';
 }
 function setPin(){
  const me=currentProfile();
@@ -2289,7 +2498,8 @@ function renderLogin(){
  box.innerHTML=a.length?a.map(x=>
   '<button class="pickrow'+(x.id===지금?' on':'')+'" onclick="loginAs(\'' +jsq(x.id)+ '\')">'
   +(x.pin?'🔒 ':'👤 ')+esc(x.name)
-  +(x.scope?'<small style="display:block;color:var(--ink3);font-weight:600">'+esc(x.scope)+'</small>':'')
+  +((x.scope||x.region)?'<small style="display:block;color:var(--ink3);font-weight:600">'
+    +esc([x.scope||'', regionText(x.region,x.area)].filter(Boolean).join(' · '))+'</small>':'')
   +'</button>').join('')
   : '<div class="empty">아직 등록된 사람이 없습니다.</div>';
  const m=document.getElementById('loginMsg'); if(m)m.textContent='';
@@ -2305,6 +2515,7 @@ function loginAs(id){
  }
  put('bookcok_guest',me.name); put('bookcok_class',me.scope||'');
  put('bookcok_school',me.school||''); put('bookcok_grade',me.grade||''); put('bookcok_room',me.room||'');
+ put('bookcok_region',me.region||''); put('bookcok_area',me.area||'');
  put('bookcok_signed','1'); put('bookcok_skiplogin','1');
  location.href=location.pathname;
 }
@@ -2315,7 +2526,7 @@ function startNewProfile(){put('bookcok_skiplogin','1');renderSignup();show('sig
    암호는 이 파일 안에 그대로 적혀 있어서 비밀이 될 수 없다.
    잠금장치가 아니라 팻말이다 — 지켜야 할 것은 여기 넣지 않는다. */
 /* 배포가 됐는지 눈으로 확인하려고 둔다. 고칠 때마다 날짜를 올린다. */
-const APP_VER='2026-09-13 · 랭킹 · 열 걸음 성장 · 백색소음 3';
+const APP_VER='2026-09-17 · 50자 기록 · 지역 구분 · 학교 대항전 · 로그인 유지';
 const ADMIN_CODE='bookcok-2026';
 const ADMIN_SEED=['만든 사람 1','만든 사람 2'];
 function getAdmins(){const a=readJSON('bookcok_admins',null);return Array.isArray(a)&&a.length?a:ADMIN_SEED}
