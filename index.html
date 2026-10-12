@@ -165,6 +165,13 @@ h1,h2,h3{letter-spacing:-.02em;line-height:1.3}
 .timer{font-size:68px;font-weight:900;text-align:center;margin:26px 0 10px;
  letter-spacing:-.04em;font-variant-numeric:tabular-nums;color:var(--brand-d)}
 .timer.over{color:var(--warn)}
+.timer.paused{color:var(--ink3)}
+
+/* ── 잠깐 뜨는 알림 ─────────────────────────────────────────── */
+.toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%) translateY(10px);
+ background:var(--ink);color:#fff;border-radius:999px;padding:11px 18px;font-size:13px;
+ font-weight:700;z-index:50;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+.toast.on{opacity:.94;transform:translateX(-50%) translateY(0)}
 .status{text-align:center;color:var(--ink2);font-size:13px}
 
 /* ── 목표 시간 ──────────────────────────────────────────────── */
@@ -1330,7 +1337,45 @@ function restoreSignIn(){
 }
 
 let timerSec=0,running=false,timerId=null,currentNoise=null;
+
+/* ── 뒤로가기 ─────────────────────────────────────────────────
+   화면이 바뀌어도 브라우저는 «한 쪽짜리 앱» 으로 본다. 그래서 뒤로가기를
+   누르면 앞 화면이 아니라 앱 밖으로 나가 버렸다 — 보관함을 보다 뒤로
+   가면 그냥 닫히는 것이다.
+
+   그래서 화면을 옮길 때마다 발자국(history)을 하나씩 남기고, 뒤로가기를
+   누르면 그 발자국을 따라 앞 화면으로 돌아간다. 홈에서 한 번 더 누르면
+   그때는 «한 번 더 누르면 닫힙니다» 라고 알려 주고, 곧바로 또 누르면 닫힌다.
+   주소는 바꾸지 않는다 — 친구 링크(#c= · #me=)가 주소에 실려 있기 때문이다. */
+let 뒤로가는중=false, 나갈까경고=0;
+function 발자국(id){
+ if(뒤로가는중)return;
+ try{history.pushState({bc:id},'',location.href)}catch(e){}
+}
+function 토스트(글){
+ let el=document.getElementById('toast');
+ if(!el){el=document.createElement('div');el.id='toast';el.className='toast';document.body.appendChild(el)}
+ el.textContent=글; el.classList.add('on');
+ clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('on'),2000);
+}
+window.addEventListener('popstate',e=>{
+ const id=e.state&&e.state.bc;
+ if(id&&document.getElementById(id)){
+  뒤로가는중=true;
+  try{show(id,null)}finally{뒤로가는중=false}
+  return;
+ }
+ /* 더 돌아갈 화면이 없다 — 한 번은 붙잡는다 */
+ if(Date.now()-나갈까경고<2200){history.back();return}
+ 나갈까경고=Date.now();
+ try{history.pushState({bc:'home'},'',location.href)}catch(e){}
+ 뒤로가는중=true;
+ try{show('home',null)}finally{뒤로가는중=false}
+ 토스트('한 번 더 누르면 앱이 닫힙니다');
+});
+
 function show(id,btn){
+ 발자국(id);
  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
  document.getElementById(id).classList.add('active');
  const titles={home:'오늘도 한 페이지부터.',reading:'독서에 몰입하는 시간',record:'오늘의 독서 기록',library:'나의 독서 보관함',bookdetail:'책별 독서 포트폴리오',growth:'나의 독서 성장',rank:'우리 반 랭킹',shareme:'내 기록 보내기',gotmate:'친구의 기록 카드',signup:'등록',login:'누구인가요?',more:'더보기',admin:'관리자',friends:'친구 책장',share:'카드 보내기',shared:'친구가 보낸 카드',nfcsetup:'NFC 태그 설정'};
@@ -1678,15 +1723,23 @@ function renderGrowth(records){
  const 남은=g.다음?g.다음.at-n:0;
  const 폭=g.다음?Math.round((n-g.지금.at)/(g.다음.at-g.지금.at)*100):100;
 
+ /* 친구를 안 골라서 멈춘 것과, 열 걸음을 다 걸은 것은 다른 일이다.
+    예전에는 둘 다 «끝까지 자랐어요» 라고 적어서, 갈림길에 선 학생은
+    더 읽어도 안 자란다고 생각했다. 그래서 따로 말한다.              */
+ const 꼬리= 갈림길 ? ' · <b>친구를 골라야 더 자랍니다</b>'
+   : g.다음 ? ' · 다음 «'+esc(g.다음.name)+'» 까지 <b>기록 '+남은+'개</b>'
+   : ' · 끝까지 자랐어요 · 기록 '+n+'개';
+
  /* 홈에 얹는 작은 카드 */
  const 작게=document.getElementById('growHome');
  if(작게) 작게.innerHTML=mascotHTML(g.지금)
   +'<div class="growtext"><b>'+esc(g.지금.name)+'</b>'
-  +'<p>'+(갈림길?'🎉 친구를 고를 때가 됐어요!':esc(g.지금.말))+'</p>'
+  +'<p>'+(갈림길?'🎉 친구를 고를 때가 됐어요! 고르면 계속 자랍니다':esc(g.지금.말))+'</p>'
   +'<div class="bar"><i style="width:'+(갈림길?100:폭)+'%"></i></div>'
   +'<small>'+걸음+' / '+allSteps()+' 걸음'
-   +(g.다음?' · 다음까지 기록 '+남은+'개':' · 끝까지 자랐어요')+'</small></div>'
-  +'<button class="secondary growgo" onclick="show(\'growth\',null)">보기</button>';
+   +(갈림길?' · 친구를 고르면 이어서':(g.다음?' · 다음까지 기록 '+남은+'개':' · 끝까지 자랐어요'))+'</small></div>'
+  +'<button class="'+(갈림길?'primary':'secondary')+' growgo" onclick="show(\'growth\',null)">'
+   +(갈림길?'🌱 친구 고르기':'보기')+'</button>';
 
  /* 성장 화면 — 크게 */
  const 큰=document.getElementById('growStage');
@@ -1694,9 +1747,7 @@ function renderGrowth(records){
   +'<div class="stagename">'+esc(g.지금.name)+'</div>'
   +'<div class="stageword">'+(갈림길?'🎉 친구를 고를 때가 됐어요!':esc(g.지금.말))+'</div>'
   +'<div class="stagebar"><i style="width:'+(갈림길?100:폭)+'%"></i></div>'
-  +'<div class="stagemeta"><b>'+걸음+'</b> / '+allSteps()+' 걸음'
-   +(g.다음?' · 다음 «'+esc(g.다음.name)+'» 까지 <b>기록 '+남은+'개</b>'
-           :' · 끝까지 자랐어요 · 기록 '+n+'개')+'</div>';
+  +'<div class="stagemeta"><b>'+걸음+'</b> / '+allSteps()+' 걸음'+꼬리+'</div>';
 
  /* 갈림길 */
  const 고르는곳=document.getElementById('pathPick');
@@ -1991,8 +2042,11 @@ function tick(){
  const done=document.getElementById('goalDone');
  if(done)done.innerHTML=(목표&&남은<=0)
   ? '<div class="goaldone"><span>🎉 '+Math.round(목표/60)+'분 목표를 채웠어요</span></div>' : '';
+ const 멈춤=!!getSession()&&!isRunning();
+ if(el&&멈춤)el.className+=' paused';
  const sub=document.getElementById('timerSub');
- if(sub)sub.textContent=목표
+ if(sub)sub.textContent= 멈춤 ? '⏸ 잠깐 멈췄어요 · 아래 «이어서 읽기» 를 누르면 다시 갑니다'
+  : 목표
   ? (남은>=0
      ? Math.round(목표/60)+'분 목표 · 지금까지 '+fmt(timerSec)+' 읽었어요'
      : Math.round(목표/60)+'분을 넘겨서 읽는 중 · 모두 '+fmt(timerSec))
@@ -2031,8 +2085,13 @@ function updateDndBanner(){
 
 function startReading(book){
  const x=getSession();
+ /* 멈춰 둔 것은 그대로 둔다.
+    예전에는 여기서 다시 켰다. 그래서 일시정지를 누르고 화면이 한 번
+    다시 뜨면(아이폰이 탭을 비웠다 돌아오거나, 태그를 다시 대거나,
+    아래 «독서» 를 다시 누르면) 시간이 혼자 다시 흘렀다.
+    학생 눈에는 «일시정지가 안 먹힌다» 로 보인다. 다시 켜는 것은
+    ▶ 이어서 읽기 버튼으로만 한다.                                  */
  if(!x){ saveSession({running:true,since:Date.now(),acc:0,book:book||'',byTag:enteredByNFC,goal:getGoalMin()*60}); timerSec=0; resetNoise(); }
- else if(!x.running) saveSession({...x,running:true,since:Date.now()});
  show('reading');
  clearInterval(timerId); timerId=setInterval(tick,1000); tick();
  updateDndBanner(); updatePauseBtn(); renderGoalRow(); 그만둘까숨기기();
@@ -2449,9 +2508,9 @@ function schoolRows(){
  });
  return [...통.values()].sort((a,b)=> b.m-a.m || b.사람-a.사람 || a.sc.localeCompare(b.sc));
 }
-function schoolRowHTML(s,i,최대){
+function schoolRowHTML(s,i,최대,혼자){
  return '<div class="schoolrow'+(s.나?' mine':'')+'">'
-  +'<div class="sk">'+(i<3?메달[i]:(i+1))+'</div>'
+  +'<div class="sk">'+(혼자?'·':(i<3?메달[i]:(i+1)))+'</div>'
   +'<div class="sbody"><div class="sname">'+esc(s.sc)+'</div>'
   +'<div class="sarea">📍 '+esc(s.rg||'지역 미상')+' · '+s.사람+'명'
    +(s.나?'<span class="mychip">우리 학교</span>':'')+'</div>'
@@ -2460,14 +2519,14 @@ function schoolRowHTML(s,i,최대){
 }
 /* 컴퓨터 화면은 왼쪽 차림표 아래에, 폰은 랭킹 화면 위에 같은 것을 보여 준다 */
 function renderSchoolRank(){
- const rows=schoolRows(), 최대=Math.max(1,...rows.map(r=>r.m));
+ const rows=schoolRows(), 최대=Math.max(1,...rows.map(r=>r.m)), 혼자=rows.length<2;
  const 옆=document.getElementById('sideSchools');
  if(옆) 옆.innerHTML='<h3>🏫 학교 대항전</h3>'
   +'<div class="label">담은 카드로 학교끼리 겨룹니다</div>'
-  +rows.slice(0,5).map((s,i)=>schoolRowHTML(s,i,최대)).join('')
-  +(rows.length<2?'<div class="label" style="margin-top:8px">친구 카드를 담으면 다른 학교가 함께 섭니다.</div>':'');
+  +rows.slice(0,5).map((s,i)=>schoolRowHTML(s,i,최대,혼자)).join('')
+  +(혼자?'<div class="label" style="margin-top:8px">다른 학교 친구의 카드를 담으면 그때부터 겨룹니다.</div>':'');
  const 판=document.getElementById('schoolBoard');
- if(판) 판.innerHTML=rows.map((s,i)=>schoolRowHTML(s,i,최대)).join('')
+ if(판) 판.innerHTML=rows.map((s,i)=>schoolRowHTML(s,i,최대,혼자)).join('')
   +(rows.length<2?'<div class="empty" style="margin-top:10px">아직 우리 학교뿐이에요.<br>다른 학교 친구의 <b>기록 카드</b>를 담으면 학교끼리 줄을 섭니다 🏫</div>':'');
 }
 const 메달=['🥇','🥈','🥉'];
@@ -2475,6 +2534,14 @@ const 메달=['🥇','🥈','🥉'];
    메달 그림은 잘 안 보여서 등수를 글자로 적는다. */
 function meCardHTML(rows,내자리){
  const 나=rows[내자리-1];
+ /* 혼자일 때는 «1위» 라고 하지 않는다. 서버가 없어서 이 폰에는 내가 담은
+    카드만 모인다. 아무도 안 담았으면 모두가 «1위 · 1명 중» 을 보게 되고,
+    반 전체가 1등인 이상한 순위표가 된다. 혼자면 등수를 아예 안 매긴다. */
+ if(rows.length<2)
+  return '<div class="rankme"><div class="rankmeno">–</div>'
+   +'<div class="rankmein"><b>'+esc(나.u)+'</b>'
+   +'<span>'+hhmm(나.m)+' · 책 '+나.b+'권</span></div>'
+   +'<div class="rankmeof">아직 나 혼자</div></div>';
  return '<div class="rankme"><div class="rankmeno">'+내자리+'<small>위</small></div>'
   +'<div class="rankmein"><b>'+(내자리<=3?메달[내자리-1]+' ':'')+esc(나.u)+'</b>'
   +'<span>'+hhmm(나.m)+' · 책 '+나.b+'권</span></div>'
@@ -2493,7 +2560,7 @@ function renderRank(){
  const 표=document.getElementById('rankList');
  if(표) 표.innerHTML=rows.map((r,i)=>
    '<div class="rankrow'+(r.나?' me':'')+'">'
-   +'<div class="rk">'+(i<3?메달[i]:(i+1))+'</div>'
+   +'<div class="rk">'+(rows.length<2?'·':(i<3?메달[i]:(i+1)))+'</div>'
    +'<div class="rkbody"><div class="rkname">'+esc(r.u)+(r.나?' <em>나</em>':'')
      +(r.k&&r.k!==CLASS?'<span class="rkclass">'+esc(r.k)+(r.rg?' · '+esc(r.rg):'')+'</span>':'')+'</div>'
    +'<div class="rkbar"><i style="width:'+Math.round(r.m/최대*100)+'%"></i></div></div>'
@@ -2503,7 +2570,9 @@ function renderRank(){
 
  const 안내=document.getElementById('rankEmpty');
  if(안내) 안내.innerHTML=getMates().length? ''
-  : '<div class="empty">아직 나 혼자예요.<br><b>내 기록 보내기</b> 로 친구에게 링크를 보내고,<br>친구가 보낸 링크를 열면 여기에 함께 서게 됩니다 👫</div>';
+  : '<div class="empty"><b>아직 순위가 없어요.</b><br>이 앱은 서버가 없어서 <b>이 폰에 담긴 카드끼리만</b> 줄을 섭니다.<br>'
+    +'친구가 보낸 <b>기록 카드 링크</b>를 열어 담아야 순위가 생깁니다 👫<br>'
+    +'<small>그래서 아무도 안 담으면 모두가 «나 혼자» 로 보입니다.</small></div>';
 }
 /* 홈에 얹는 순위 카드 — 앱을 열면 바로 보이게 */
 function renderRankHome(){
@@ -2515,12 +2584,12 @@ function renderRankHome(){
   +'<button class="linkbtn" onclick="show(\'rank\',null)">전체 보기</button></div>'
   +'<div class="rankcard">'
   + meCardHTML(rows,내자리)
-  + 위.map((r,i)=>'<div class="rankrow small'+(r.나?' me':'')+'">'
+  + (rows.length<2?'':위.map((r,i)=>'<div class="rankrow small'+(r.나?' me':'')+'">'
     +'<div class="rk">'+메달[i]+'</div>'
     +'<div class="rkbody"><div class="rkname">'+esc(r.u)+(r.나?' <em>나</em>':'')+'</div>'
     +'<div class="rkbar"><i style="width:'+Math.round(r.m/최대*100)+'%"></i></div></div>'
-    +'<div class="rkval"><b>'+hhmm(r.m)+'</b><span>책 '+r.b+'권</span></div></div>').join('')
-  +(getMates().length?'':'<p class="label" style="margin:10px 2px 0">친구에게 <b>내 기록 카드</b>를 보내면 함께 순위에 섭니다.</p>')
+    +'<div class="rkval"><b>'+hhmm(r.m)+'</b><span>책 '+r.b+'권</span></div></div>').join(''))
+  +(rows.length<2?'<p class="label" style="margin:10px 2px 0">아직 순위가 없어요. 친구가 보낸 <b>기록 카드 링크</b>를 담으면 그때부터 줄을 섭니다.</p>':'')
   +'<div class="adminrow" style="margin-top:12px">'
   +'<button class="primary" onclick="shareMe()">📤 내 기록 보내기</button>'
   +'<button class="secondary" onclick="show(\'rank\',null)">🏆 랭킹 보기</button></div>'
@@ -2678,7 +2747,7 @@ function startNewProfile(){put('bookcok_skiplogin','1');renderSignup();show('sig
    암호는 이 파일 안에 그대로 적혀 있어서 비밀이 될 수 없다.
    잠금장치가 아니라 팻말이다 — 지켜야 할 것은 여기 넣지 않는다. */
 /* 배포가 됐는지 눈으로 확인하려고 둔다. 고칠 때마다 날짜를 올린다. */
-const APP_VER='2026-09-21 · 목표 시간 거꾸로 타이머 · 독려 멘트';
+const APP_VER='2026-10-12 · 일시정지·뒤로가기·랭킹·성장 버그 수정';
 const ADMIN_CODE='bookcok-2026';
 const ADMIN_SEED=['만든 사람 1','만든 사람 2'];
 function getAdmins(){const a=readJSON('bookcok_admins',null);return Array.isArray(a)&&a.length?a:ADMIN_SEED}
