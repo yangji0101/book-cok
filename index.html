@@ -224,6 +224,16 @@ h1,h2,h3{letter-spacing:-.02em;line-height:1.3}
  background:var(--paper);transition:border-color .15s,box-shadow .15s}
 .input:focus{outline:0;border-color:var(--brand);box-shadow:0 0 0 3px rgba(47,107,74,.12)}
 .textarea{min-height:130px;resize:vertical}
+/* 읽은 쪽 — 시작과 끝을 따로 받는다 (물결표를 손으로 치지 않게) */
+.pagerow{display:flex;align-items:center;gap:8px}
+.pagerow .input{flex:1;min-width:0;text-align:center;font-variant-numeric:tabular-nums}
+.pagerow .input::-webkit-outer-spin-button,
+.pagerow .input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.pagerow .input[type=number]{-moz-appearance:textfield}
+.pagetil{flex:none;font-size:14px;font-weight:800;color:var(--ink3)}
+#pageNote:empty{display:none}
+#pageNote{margin:6px 0 0}
+
 .readtime{font-size:14px;font-weight:800;color:var(--brand-d);background:var(--brand-l);
  border:1px solid var(--brand-b);border-radius:var(--r-sm);padding:11px 14px;margin-bottom:8px}
 .readtime:empty{display:none}
@@ -613,7 +623,14 @@ table.prep td:first-child{width:34%;white-space:nowrap;color:var(--brand-d);font
 <div id="recordTime" class="readtime"></div>
 <div id="dndOff"></div>
 <label>책 제목</label><input id="bookTitle" class="input" placeholder="예: 데미안">
-<label>읽은 범위</label><input id="bookRange" class="input" placeholder="예: 32p ~ 57p">
+<label>읽은 쪽</label>
+<div class="pagerow">
+ <input id="pageFrom" class="input" type="number" inputmode="numeric" min="1" max="9999" placeholder="시작" oninput="pageHint()">
+ <span class="pagetil">~</span>
+ <input id="pageTo" class="input" type="number" inputmode="numeric" min="1" max="9999" placeholder="끝" oninput="pageHint()">
+ <span class="pagetil">쪽</span>
+</div>
+<p class="label" id="pageNote"></p>
 <label>오늘의 한 문장</label><input id="bookQuote" class="input" placeholder="기억에 남은 문장이나 생각" oninput="charCount()">
 <label>내 생각</label><textarea id="bookThought" class="input textarea" placeholder="왜 인상 깊었는지 자유롭게 적어보세요. 문장과 생각을 합쳐 50자 이상 써야 기록으로 저장됩니다." oninput="charCount()"></textarea>
 <div class="charnote" id="charNote"></div>
@@ -1399,9 +1416,10 @@ function fmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60)
    특히 timerSec — 안 비우면 나중에 기록 탭을 눌러 쓴 글에도
    아까 읽은 시간이 그대로 붙는다. */
 function clearEntryForm(){
- ['bookTitle','bookRange','bookQuote','bookThought'].forEach(id=>{
+ ['bookTitle','pageFrom','pageTo','bookQuote','bookThought'].forEach(id=>{
   const el=document.getElementById(id); if(el)el.value='';
  });
+ pageHint();
  timerSec=0; resetNoise(); clearPending();
  const rt=document.getElementById('recordTime'); if(rt)rt.textContent='';
  const pn=document.getElementById('pendNote'); if(pn)pn.innerHTML='';
@@ -1597,6 +1615,34 @@ async function checkSound(){
    «읽었다» 만 눌러 기록만 쌓는 것을 막는다. 오늘의 한 문장과 내 생각을
    합쳐 50자를 넘어야 저장된다. 띄어쓰기를 늘려 채우지 못하게, 이어진
    공백은 한 칸으로 세고 앞뒤 공백은 빼고 센다.                     */
+/* ── 읽은 쪽 ──────────────────────────────────────────────────
+   예전에는 «32p ~ 57p» 처럼 한 칸에 손으로 다 적어야 했다. 폰에서
+   물결표를 찾아 치는 것이 번거로워서 시작·끝 두 칸으로 나눴다.
+   저장은 예전과 같은 한 줄('32~57')이라 이미 쌓인 기록과 섞인다.  */
+function pageVal(id){
+ const el=document.getElementById(id); if(!el)return 0;
+ const n=parseInt(el.value,10);
+ return isFinite(n)&&n>0 ? Math.min(n,9999) : 0;
+}
+function rangeText(){
+ const a=pageVal('pageFrom'), b=pageVal('pageTo');
+ if(a&&b) return a+'~'+b;
+ return a? String(a) : (b? String(b) : '');
+}
+/* 쓰다 만 기록을 되살릴 때 — '32~57' · '32-57' · '32p ~ 57p' 다 받아 준다 */
+function setRange(str){
+ const 숫자=String(str||'').match(/\d{1,4}/g)||[];
+ const set=(id,v)=>{const el=document.getElementById(id); if(el)el.value=v||''};
+ set('pageFrom',숫자[0]); set('pageTo',숫자[1]);
+ pageHint();
+}
+function pageHint(){
+ const el=document.getElementById('pageNote'); if(!el)return;
+ const a=pageVal('pageFrom'), b=pageVal('pageTo');
+ if(a&&b&&b<a){el.textContent='↩️ 끝 쪽이 시작보다 작아요. 바꿔서 넣어 주세요.';return}
+ el.textContent=(a&&b)?'오늘 '+(b-a+1)+'쪽 읽었어요':'';
+}
+
 const MIN_LOG=50;
 function logText(){
  const q=(document.getElementById('bookQuote')||{}).value||'';
@@ -1614,7 +1660,7 @@ function charCount(){
 }
 async function saveRecord(){
  const title=(document.getElementById('bookTitle').value||'제목 없음').trim();
- const range=document.getElementById('bookRange').value.trim();
+ const range=rangeText();
  const quote=document.getElementById('bookQuote').value.trim();
  const thought=document.getElementById('bookThought').value.trim();
  if(!title){alert('책 제목을 입력해주세요.');return}
@@ -2115,7 +2161,7 @@ const fieldVal=id=>{const el=document.getElementById(id);return el?el.value:''};
 function savePending(){
  if(!timerSec && !fieldVal('bookTitle')) return;
  put(K('pending'),JSON.stringify({
-  duration:timerSec, book:fieldVal('bookTitle'), range:fieldVal('bookRange'),
+  duration:timerSec, book:fieldVal('bookTitle'), range:rangeText(),
   quote:fieldVal('bookQuote'), thought:fieldVal('bookThought'),
   noise:currentNoise||'없음', goal:goalSec(), at:Date.now()}));
 }
@@ -2130,7 +2176,7 @@ function restorePending(x){
  timerSec=Math.max(0,Math.floor(Number(x.duration)||0));
  currentNoise=(x.noise&&x.noise!=='없음')?x.noise:null;
  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||''};
- set('bookTitle',x.book); set('bookRange',x.range);
+ set('bookTitle',x.book); setRange(x.range);
  set('bookQuote',x.quote); set('bookThought',x.thought);
  const el=document.getElementById('recordTime');
  if(el)el.textContent=timerSec?'⏱️ 이번에 읽은 시간 '+fmt(timerSec):'';
@@ -2207,7 +2253,7 @@ function finishReading(byUser){
  }
  그만둘까숨기기(); 붙잡았나=false;
  clearInterval(timerId); saveSession(null); stopNoise();
- document.getElementById('bookRange').value='';
+ setRange('');
  if(x&&x.book) document.getElementById('bookTitle').value=x.book;
  const rt=document.getElementById('recordTime');
  if(rt)rt.textContent=timerSec?'⏱️ 이번에 읽은 시간 '+fmt(timerSec):'';
@@ -2408,7 +2454,7 @@ function renderFriends(){
 window.addEventListener('hashchange',()=>{readShared()});
 /* 쓰는 도중에 앱이 꺼지거나 단축어로 넘어가도 잃지 않게 계속 적어 둔다 */
 let pendTimer=null;
-['bookTitle','bookRange','bookQuote','bookThought'].forEach(id=>{
+['bookTitle','pageFrom','pageTo','bookQuote','bookThought'].forEach(id=>{
  const el=document.getElementById(id); if(!el)return;
  el.addEventListener('input',()=>{clearTimeout(pendTimer);pendTimer=setTimeout(savePending,600)});
 });
@@ -2747,7 +2793,7 @@ function startNewProfile(){put('bookcok_skiplogin','1');renderSignup();show('sig
    암호는 이 파일 안에 그대로 적혀 있어서 비밀이 될 수 없다.
    잠금장치가 아니라 팻말이다 — 지켜야 할 것은 여기 넣지 않는다. */
 /* 배포가 됐는지 눈으로 확인하려고 둔다. 고칠 때마다 날짜를 올린다. */
-const APP_VER='2026-10-12 · 일시정지·뒤로가기·랭킹·성장 버그 수정';
+const APP_VER='2026-10-13 · 읽은 쪽을 시작·끝 두 칸으로';
 const ADMIN_CODE='bookcok-2026';
 const ADMIN_SEED=['만든 사람 1','만든 사람 2'];
 function getAdmins(){const a=readJSON('bookcok_admins',null);return Array.isArray(a)&&a.length?a:ADMIN_SEED}
